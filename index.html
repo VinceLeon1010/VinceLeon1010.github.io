@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>广告文案生成与JSON解析工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 25px 30px;
+            border-bottom: 4px solid #3a56a4;
+        }
+        
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        header h1 i {
+            color: #6dd5ed;
+        }
+        
+        header p {
+            opacity: 0.85;
+            font-size: 16px;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: #f0f4f8;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 18px 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            color: #555;
+        }
+        
+        .tab:hover {
+            background-color: #e3eaf3;
+        }
+        
+        .tab.active {
+            background-color: white;
+            color: #4b6cb7;
+            border-bottom: 3px solid #4b6cb7;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+            min-height: 500px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* 第一个标签页样式 */
+        .input-section {
+            margin-bottom: 30px;
+        }
+        
+        .input-section label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #444;
+            font-size: 18px;
+        }
+        
+        .url-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .url-input:focus {
+            border-color: #4b6cb7;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(75, 108, 183, 0.1);
+        }
+        
+        .url-parts {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .url-part {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9fafc;
+            border-radius: 6px;
+            border-left: 4px solid #4b6cb7;
+        }
+        
+        .url-part-label {
+            min-width: 120px;
+            font-weight: 600;
+            color: #4b6cb7;
+        }
+        
+        .url-part-content {
+            flex: 1;
+            padding: 0 15px;
+            word-break: break-all;
+        }
+        
+        .url-part-copy {
+            background-color: #4b6cb7;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .url-part-copy:hover {
+            background-color: #3a56a4;
+        }
+        
+        .template-container {
+            margin-top: 20px;
+        }
+        
+        .template-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .template-label span {
+            font-weight: 600;
+            color: #444;
+            font-size: 18px;
+        }
+        
+        .template-text {
+            width: 100%;
+            min-height: 320px;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9fafc;
+            font-size: 16px;
+            line-height: 1.6;
+            resize: vertical;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            color: #333;
+        }
+        
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(90deg, #4b6cb7 0%, #3a56a4 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .copy-btn:hover {
+            background: linear-gradient(90deg, #3a56a4 0%, #2a3f7a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(75, 108, 183, 0.3);
+        }
+        
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+        
+        .copy-btn.hidden {
+            display: none;
+        }
+        .success-message.hidden{
+            display: none;
+        }
+        
+        .copy-btn i {
+            font-size: 18px;
+        }
+        
+        /* 第二个标签页样式 */
+        .json-parser {
+            display: flex;
+            gap: 30px;
+            height: 600px;
+        }
+        
+        .json-input-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .json-textarea {
+            flex: 1;
+            width: 100%;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            resize: none;
+            line-height: 1.5;
+        }
+        
+        .json-textarea:focus {
+            border-color: #4b6cb7;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(75, 108, 183, 0.1);
+        }
+        
+        .parse-btn-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .parse-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(90deg, #4b6cb7 0%, #3a56a4 100%);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(75, 108, 183, 0.3);
+        }
+        
+        .parse-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(75, 108, 183, 0.4);
+        }
+        
+        .json-output-section {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .json-output-section h3 {
+            margin-bottom: 20px;
+            color: #444;
+            font-size: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .data-table th {
+            background-color: #4b6cb7;
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #f9fafc;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f0f4f8;
+        }
+        
+        .copy-cell-btn, .copy-section-btn {
+            background-color: #4b6cb7;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .copy-section-btn {
+            background-color: #3a56a4;
+            margin-left: 10px;
+        }
+        
+        .copy-cell-btn:hover, .copy-section-btn:hover {
+            background-color: #2a3f7a;
+        }
+        
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .table-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .json-parser {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .json-input-section, .json-output-section {
+                width: 100%;
+            }
+            
+            .json-output-section {
+                margin-top: 30px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 8px;
+            }
+            
+            header {
+                padding: 20px;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                padding: 15px;
+            }
+            
+            .url-part {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .url-part-label {
+                margin-bottom: 5px;
+            }
+            
+            .url-part-content {
+                padding: 0;
+                margin-bottom: 10px;
+            }
+        }
+        
+        /* 提示信息样式 */
+        .info-message {
+            background-color: #e8f4fd;
+            border-left: 4px solid #4b6cb7;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .success-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            animation: fadeInOut 3s ease;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(20px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-magic"></i> 广告文案生成与JSON解析工具</h1>
+            <p>输入品牌链接生成Prompt模板，或解析JSON数据为表格格式</p>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="tab1">Prompt模板</div>
+            <div class="tab" data-tab="tab2">JSON解析</div>
+        </div>
+        
+        <!-- 第一个标签页：Prompt模板 -->
+        <div id="tab1" class="tab-content active">
+            <div class="input-section">
+                <label for="urlInput"><i class="fas fa-link"></i> 请输入品牌首页链接：</label>
+                <input type="text" id="urlInput" class="url-input" placeholder="例如：https://www.kickstarter.com/projects/1034711958/under-sky-the-satellite-inspired-lamp-for-every-scenario?ref=79eqve&utm_campaign=044ee937&utm_content=link&utm_medium=kickbooster&utm_source=kickbooster-direct">
+                <div class="info-message">
+                    提示：输入链接后，系统会自动提取?之前的部分，并替换模板中的{url}占位符
+                </div>
+                
+                <!-- URL解析结果显示区域 -->
+                <div id="urlParts" class="url-parts">
+                    <div class="url-part">
+                        <div class="url-part-label">网页部分：</div>
+                        <div class="url-part-content" id="urlBase"></div>
+                        <button class="url-part-copy" data-target="urlBase">
+                            <i class="fas fa-copy"></i> 复制
+                        </button>
+                    </div>
+                    <div class="url-part">
+                        <div class="url-part-label">参数部分：</div>
+                        <div class="url-part-content" id="urlParams"></div>
+                        <button class="url-part-copy" data-target="urlParams">
+                            <i class="fas fa-copy"></i> 复制
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="template-container">
+                <div class="template-label">
+                    <span><i class="fas fa-file-alt"></i> Prompt模板：</span>
+                </div>
+                <textarea id="templateText" class="template-text" readonly>基于这个品牌首页的内容:{url}
+提炼落地页核心信息，然后根据这些页面信息提供适用于谷歌广告投放的内容，要求包含：
+1、5条固定显示内容，产品名+特色信息/核心功能，用英文，最多20个字符；
+2、18条不同侧重点的关键字标题，用英文，最多30个字符，并且标注每条广告标题的侧重点是什么，表格形式：侧重点、字符数、内容）、
+3、8条不同角度或侧重点的description，用英文，最多88个字符，并且标注每条广告描述语的侧重点是什么，表格形式：侧重点、字符数、内容
+4、40个适合投放的关键词，用英文，表格形式，要求关键词的搜索量不低于谷歌要求，字眼符合谷歌要求，至少要有1条是品牌名字，1条是产品名字。
+以上投放内容要严格审查规避谷歌广告要求的大写过多的问题、政策敏感字的问题等，确保谷歌广告审核通过！
+注意：生成的关键词，不能有类似Kickstarter tech project、kickstarter ai、best kickstarter projects之类的含义宽泛的关键字，要求关键词对产品功能、品类、使用场景、目标用户、特色点、创新点、商品主要卖点等描述精确，并且关键词可能的搜索度要极尽所能的追求更高。
+【输出格式】
+必须是合法的 JSON 对象，不包含 Markdown 格式：
+{
+    "pinned_headlines": [
+        {
+            "content": "固定展示内容，用英文"
+        }
+    ],
+    "headlines": [
+        {
+            "emphasis": "侧重点，用中文",
+            "char_count": 字符数(整数),
+            "content": "标题，用英文"
+        }
+    ],
+    "descriptions": [
+        {
+            "emphasis": "侧重点，用中文",
+            "char_count": 字符数(整数),
+            "content": "描述语，用英文"
+        }
+    ],
+    "keywords": [
+        {
+            "type": "关键词类别，用中文",
+            "content": "广告搜索关键词，用英文，首字母不需要大写"
+        }
+    ]
+}</textarea>
+                <button id="copyTemplateBtn" class="copy-btn hidden">
+                    <i class="fas fa-copy"></i> 复制模板内容
+                </button>
+            </div>
+        </div>
+        
+        <!-- 第二个标签页：JSON解析 -->
+        <div id="tab2" class="tab-content">
+            <div class="json-parser">
+                <div class="json-input-section">
+                    <label for="jsonInput"><i class="fas fa-code"></i> 请输入JSON数据：</label>
+                    <textarea id="jsonInput" class="json-textarea" placeholder='粘贴JSON数据，例如：
+{
+  "pinned_headlines": [
+    {"content": "ProductX - Innovative Design"},
+    {"content": "ProductX - User Friendly"}
+  ],
+  "headlines": [
+    {"emphasis": "功能特点", "char_count": 25, "content": "Innovative Design ProductX"},
+    {"emphasis": "价格优势", "char_count": 22, "content": "Affordable Price ProductX"}
+  ],
+  "descriptions": [
+    {"emphasis": "产品介绍", "char_count": 75, "content": "ProductX offers innovative design with user-friendly features for modern living."},
+    {"emphasis": "价格优势", "char_count": 70, "content": "Get the best value with ProductX affordable pricing and premium quality."}
+  ],
+  "keywords": [
+    {"type": "品牌词", "content": "ProductX"},
+    {"type": "产品词", "content": "innovative design"}
+  ]
+}'></textarea>
+                </div>
+                
+                <div class="parse-btn-container">
+                    <button id="parseBtn" class="parse-btn" title="解析JSON">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <div class="json-output-section">
+                    <h3><i class="fas fa-table"></i> 解析结果：</h3>
+                    <div id="parsedResult">
+                        <div class="info-message">
+                            请在左侧输入JSON数据，然后点击解析按钮
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 复制成功提示 -->
+    <div id="copySuccess" class="success-message hidden">
+        <i class="fas fa-check-circle"></i>
+        <span>内容已复制到剪贴板！</span>
+    </div>
+
+    <script>
+        // 标签页切换
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有标签的active类
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // 添加当前标签的active类
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+        
+        // 第一个标签页功能
+        const urlInput = document.getElementById('urlInput');
+        const templateText = document.getElementById('templateText');
+        const copyTemplateBtn = document.getElementById('copyTemplateBtn');
+        const copySuccess = document.getElementById('copySuccess');
+        const urlParts = document.getElementById('urlParts');
+        const urlBase = document.getElementById('urlBase');
+        const urlParams = document.getElementById('urlParams');
+        
+        // 原始模板文本
+        const originalTemplate = templateText.value;
+        
+        // 从本地存储加载数据
+        function loadFromLocalStorage() {
+            const savedUrl = localStorage.getItem('adTool_url');
+            const savedJson = localStorage.getItem('adTool_json');
+            
+            if (savedUrl) {
+                urlInput.value = savedUrl;
+                processUrlInput(savedUrl);
+            }
+            
+            if (savedJson) {
+                jsonInput.value = savedJson;
+            }
+        }
+        
+        // 保存数据到本地存储
+        function saveToLocalStorage() {
+            localStorage.setItem('adTool_url', urlInput.value);
+            localStorage.setItem('adTool_json', jsonInput.value);
+        }
+        
+        // 处理URL输入
+        function processUrlInput(url) {
+            if (url) {
+                // 提取?之前的部分
+                let urlWithoutParams = url;
+                let paramsPart = '';
+                
+                if (url.includes('?')) {
+                    urlWithoutParams = url.split('?')[0];
+                    paramsPart = '{lpurl}?' + url.split('?')[1];
+                }
+                
+                // 替换模板中的{url}
+                const updatedTemplate = originalTemplate.replace(/{url}/g, urlWithoutParams);
+                templateText.value = updatedTemplate;
+                
+                // 显示URL解析结果
+                urlBase.textContent = urlWithoutParams;
+                urlParams.textContent = paramsPart || '(无参数)';
+                urlParts.style.display = 'block';
+                
+                // 显示复制按钮
+                copyTemplateBtn.classList.remove('hidden');
+            } else {
+                // 恢复原始模板
+                templateText.value = originalTemplate;
+                copyTemplateBtn.classList.add('hidden');
+                urlParts.style.display = 'none';
+            }
+        }
+        
+        // 监听URL输入变化
+        urlInput.addEventListener('input', function() {
+            const url = this.value.trim();
+            processUrlInput(url);
+            saveToLocalStorage();
+        });
+        
+        // 复制模板内容
+        copyTemplateBtn.addEventListener('click', async function() {
+            try {
+                await navigator.clipboard.writeText(templateText.value);
+                showCopySuccess();
+            } catch (err) {
+                console.error('复制失败: ', err);
+                // 备用方法
+                const textArea = document.createElement('textarea');
+                textArea.value = templateText.value;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showCopySuccess();
+            }
+        });
+        
+        // URL部分复制按钮
+        document.querySelectorAll('.url-part-copy').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const content = document.getElementById(targetId).textContent;
+                copyToClipboard(content);
+            });
+        });
+        
+        // 第二个标签页功能
+        const jsonInput = document.getElementById('jsonInput');
+        const parseBtn = document.getElementById('parseBtn');
+        const parsedResult = document.getElementById('parsedResult');
+        
+        // 监听JSON输入变化
+        jsonInput.addEventListener('input', function() {
+            saveToLocalStorage();
+        });
+        
+        // 解析JSON按钮点击事件
+        parseBtn.addEventListener('click', function() {
+            const jsonString = jsonInput.value.trim();
+            
+            if (!jsonString) {
+                parsedResult.innerHTML = '<div class="info-message">请输入JSON数据</div>';
+                return;
+            }
+            
+            try {
+                const jsonData = JSON.parse(jsonString);
+                renderParsedJSON(jsonData);
+            } catch (error) {
+                parsedResult.innerHTML = `<div class="info-message" style="background-color:#fde8e8;border-left-color:#f44336;">
+                    <strong>JSON解析错误：</strong>${error.message}
+                </div>`;
+            }
+        });
+        
+        // 渲染解析后的JSON数据
+        function renderParsedJSON(data) {
+            let html = '';
+            
+            // 固定展示内容表格
+            if (data.pinned_headlines && data.pinned_headlines.length > 0) {
+                html += `
+                <div class="table-header">
+                    <h4><i class="fas fa-thumbtack"></i> 固定展示内容 (${data.pinned_headlines.length}条)</h4>
+                    <button class="copy-section-btn" data-section="pinned_headlines">
+                        <i class="fas fa-copy"></i> 复制全部
+                    </button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th width="80">序号</th>
+                            <th>内容</th>
+                            <th width="100">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+                
+                data.pinned_headlines.forEach((item, index) => {
+                    html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${escapeHtml(item.content)}</td>
+                        <td><button class="copy-cell-btn" data-content="${escapeHtml(item.content)}">复制</button></td>
+                    </tr>
+                    `;
+                });
+                
+                html += `</tbody></table>`;
+            }
+            
+            // 标题表格
+            if (data.headlines && data.headlines.length > 0) {
+                html += `
+                <div class="table-header">
+                    <h4><i class="fas fa-heading"></i> 标题 (${data.headlines.length}条)</h4>
+                    <button class="copy-section-btn" data-section="headlines">
+                        <i class="fas fa-copy"></i> 复制全部
+                    </button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th width="80">序号</th>
+                            <th>侧重点</th>
+                            <th width="100">字符数</th>
+                            <th>内容</th>
+                            <th width="100">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+                
+                data.headlines.forEach((item, index) => {
+                    html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${escapeHtml(item.emphasis)}</td>
+                        <td>${item.char_count || 'N/A'}</td>
+                        <td>${escapeHtml(item.content)}</td>
+                        <td><button class="copy-cell-btn" data-content="${escapeHtml(item.content)}">复制</button></td>
+                    </tr>
+                    `;
+                });
+                
+                html += `</tbody></table>`;
+            }
+            
+            // 描述语句表格
+            if (data.descriptions && data.descriptions.length > 0) {
+                html += `
+                <div class="table-header">
+                    <h4><i class="fas fa-align-left"></i> 描述语句 (${data.descriptions.length}条)</h4>
+                    <button class="copy-section-btn" data-section="descriptions">
+                        <i class="fas fa-copy"></i> 复制全部
+                    </button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th width="80">序号</th>
+                            <th>侧重点</th>
+                            <th width="100">字符数</th>
+                            <th>内容</th>
+                            <th width="100">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+                
+                data.descriptions.forEach((item, index) => {
+                    html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${escapeHtml(item.emphasis)}</td>
+                        <td>${item.char_count || 'N/A'}</td>
+                        <td>${escapeHtml(item.content)}</td>
+                        <td><button class="copy-cell-btn" data-content="${escapeHtml(item.content)}">复制</button></td>
+                    </tr>
+                    `;
+                });
+                
+                html += `</tbody></table>`;
+            }
+            
+            // 关键词表格
+            if (data.keywords && data.keywords.length > 0) {
+                html += `
+                <div class="table-header">
+                    <h4><i class="fas fa-key"></i> 关键词 (${data.keywords.length}个)</h4>
+                    <button class="copy-section-btn" data-section="keywords">
+                        <i class="fas fa-copy"></i> 复制全部
+                    </button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th width="80">序号</th>
+                            <th>类型</th>
+                            <th>内容</th>
+                            <th width="100">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+                
+                data.keywords.forEach((item, index) => {
+                    html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${escapeHtml(item.type)}</td>
+                        <td>${escapeHtml(item.content)}</td>
+                        <td><button class="copy-cell-btn" data-content="${escapeHtml(item.content)}">复制</button></td>
+                    </tr>
+                    `;
+                });
+                
+                html += `</tbody></table>`;
+            }
+            
+            parsedResult.innerHTML = html;
+            
+            // 添加复制事件监听器
+            addCopyEventListeners(data);
+        }
+        
+        // 为复制按钮添加事件监听器
+        function addCopyEventListeners(data) {
+            // 单个内容复制按钮
+            document.querySelectorAll('.copy-cell-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const content = this.getAttribute('data-content');
+                    copyToClipboard(content);
+                });
+            });
+            
+            // 整个部分复制按钮
+            document.querySelectorAll('.copy-section-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    let allContent = '';
+                    
+                    if (data[section]) {
+                        data[section].forEach(item => {
+                            if (item.content) {
+                                allContent += item.content + '\n';
+                            }
+                        });
+                    }
+                    
+                    if (allContent) {
+                        copyToClipboard(allContent.trim());
+                    }
+                });
+            });
+        }
+        
+        // 复制到剪贴板
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showCopySuccess();
+            } catch (err) {
+                console.error('复制失败: ', err);
+                // 备用方法
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showCopySuccess();
+            }
+        }
+        
+        // 显示复制成功提示
+        function showCopySuccess() {
+            copySuccess.classList.remove('hidden');
+            setTimeout(() => {
+                copySuccess.classList.add('hidden');
+            }, 3000);
+        }
+        
+        // HTML转义函数
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从本地存储加载数据
+            loadFromLocalStorage();
+            
+            // 预填充示例JSON
+            if (!jsonInput.value.trim()) {
+                jsonInput.value = `{
+  "pinned_headlines": [
+    {"content": "EcoBottle - Sustainable Design"},
+    {"content": "EcoBottle - Keeps Hot 12H"}
+  ],
+  "headlines": [
+    {"emphasis": "环保材料", "char_count": 24, "content": "Eco-Friendly Water Bottle"},
+    {"emphasis": "保温性能", "char_count": 28, "content": "Keep Drinks Hot for 12 Hours"}
+  ],
+  "descriptions": [
+    {"emphasis": "产品介绍", "char_count": 80, "content": "EcoBottle is a sustainable water bottle made from BPA-free materials, perfect for daily hydration needs."},
+    {"emphasis": "价值主张", "char_count": 75, "content": "Get premium quality at an affordable price with our 2-year warranty and customer support."}
+  ],
+  "keywords": [
+    {"type": "品牌词", "content": "EcoBottle"},
+    {"type": "品牌词", "content": "Eco Bottle"},
+    {"type": "功能词", "content": "dishwasher safe bottle"},
+    {"type": "通用词", "content": "best water bottle"}
+  ]
+}`;
+                saveToLocalStorage();
+            }
+        });
+    </script>
+</body>
+</html>
