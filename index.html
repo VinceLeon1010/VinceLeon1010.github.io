@@ -164,6 +164,39 @@
             background-color: #3a56a4;
         }
         
+        /* 模板选择器样式 */
+        .template-selector {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9fafc;
+            border-radius: 8px;
+            border-left: 4px solid #4b6cb7;
+        }
+        
+        .template-selector label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #444;
+            font-size: 18px;
+        }
+        
+        .template-dropdown {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        .template-dropdown:focus {
+            border-color: #4b6cb7;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(75, 108, 183, 0.1);
+        }
+        
         .template-container {
             margin-top: 20px;
         }
@@ -498,49 +531,23 @@
                         </button>
                     </div>
                 </div>
+                
+                <!-- 模板选择器 -->
+                <div class="template-selector">
+                    <label for="templateType"><i class="fas fa-file-code"></i> 选择模板类型：</label>
+                    <select id="templateType" class="template-dropdown">
+                        <option value="Kickstarter">KickStarter模板（用于Gemini）</option>
+                        <option value="Amazon">Amazon商家页模板（用于ChatGPT）</option>
+                        <option value="AmazonDetail">Amazon产品页模板（用于ChatGPT）</option>
+                    </select>
+                </div>
             </div>
             
             <div class="template-container">
                 <div class="template-label">
                     <span><i class="fas fa-file-alt"></i> Prompt模板：</span>
                 </div>
-                <textarea id="templateText" class="template-text" readonly>基于这个品牌首页的内容:{url}
-提炼落地页核心信息，然后根据这些页面信息提供适用于谷歌广告投放的内容，要求包含：
-1、5条固定显示内容，产品名+特色信息/核心功能，用英文，最多20个字符；
-2、18条不同侧重点的关键字标题，用英文，最多30个字符，并且标注每条广告标题的侧重点是什么，表格形式：侧重点、字符数、内容）、
-3、8条不同角度或侧重点的description，用英文，最多88个字符，并且标注每条广告描述语的侧重点是什么，表格形式：侧重点、字符数、内容
-4、40个适合投放的关键词，用英文，表格形式，要求关键词的搜索量不低于谷歌要求，字眼符合谷歌要求，至少要有1条是品牌名字，1条是产品名字。
-以上投放内容要严格审查规避谷歌广告要求的大写过多的问题、政策敏感字的问题等，确保谷歌广告审核通过！ 
-注意：生成的关键词，不能有类似Kickstarter tech project、kickstarter ai、best kickstarter projects、crowdfunding projects、product crowdfunding、crowdfunding games、funding projects之类的含义宽泛的关键字，要求关键词对产品功能、品类、使用场景、目标用户、特色点、创新点、商品主要卖点等描述精确，并且关键词可能的搜索度要极尽所能的追求更高。
-【输出格式】
-必须是合法的 JSON 对象，不包含 Markdown 格式，对于内容中的特殊符号如双引号、单引号等在输出时注意使用转义：
-{
-    "pinned_headlines": [
-        {
-            "content": "固定展示内容，用英文"
-        }
-    ],
-    "headlines": [
-        {
-            "emphasis": "侧重点，用中文",
-            "char_count": 字符数(整数),
-            "content": "标题，用英文"
-        }
-    ],
-    "descriptions": [
-        {
-            "emphasis": "侧重点，用中文",
-            "char_count": 字符数(整数),
-            "content": "描述语，用英文"
-        }
-    ],
-    "keywords": [
-        {
-            "type": "关键词类别，用中文",
-            "content": "广告搜索关键词，用英文，首字母不需要大写"
-        }
-    ]
-}</textarea>
+                <textarea id="templateText" class="template-text" readonly></textarea>
                 <button id="copyTemplateBtn" class="copy-btn hidden">
                     <i class="fas fa-copy"></i> 复制模板内容
                 </button>
@@ -598,6 +605,121 @@
     </div>
 
     <script>
+        // 定义模板内容
+        const templates = {
+            Kickstarter: `基于这个KickStarter的品牌首页的内容:{url}
+提炼落地页核心信息，然后根据这些页面信息提供适用于谷歌广告投放的内容，要求包含：
+1、5条固定显示内容，产品名+特色信息/核心功能，用英文，最多20个字符；
+2、18条不同侧重点的关键字标题，用英文，最多30个字符，并且标注每条广告标题的侧重点是什么，表格形式：侧重点、字符数、内容）、
+3、8条不同角度或侧重点的description，用英文，最多88个字符，并且标注每条广告描述语的侧重点是什么，表格形式：侧重点、字符数、内容
+4、40个适合投放的关键词，用英文，表格形式，要求关键词的搜索量不低于谷歌要求，字眼符合谷歌要求，至少要有1条是品牌名字，1条是产品名字。
+以上投放内容要严格审查规避谷歌广告要求的大写过多的问题、政策敏感字的问题等，确保谷歌广告审核通过！ 
+注意：生成的关键词，不能有类似Kickstarter tech project、kickstarter ai、best kickstarter projects、crowdfunding projects、product crowdfunding、crowdfunding games、funding projects之类的含义宽泛的关键字，要求关键词对产品功能、品类、使用场景、目标用户、特色点、创新点、商品主要卖点等描述精确，并且关键词可能的搜索度要极尽所能的追求更高。
+【输出格式】
+必须是合法的 JSON 对象，不包含 Markdown 格式，对于内容中的特殊符号如双引号、单引号等在输出时注意使用转义：
+{
+    "pinned_headlines": [
+        {
+            "content": "固定展示内容，用英文"
+        }
+    ],
+    "headlines": [
+        {
+            "emphasis": "侧重点，用中文",
+            "char_count": 字符数(整数),
+            "content": "标题，用英文"
+        }
+    ],
+    "descriptions": [
+        {
+            "emphasis": "侧重点，用中文",
+            "char_count": 字符数(整数),
+            "content": "描述语，用英文"
+        }
+    ],
+    "keywords": [
+        {
+            "type": "关键词类别，用中文",
+            "content": "广告搜索关键词，用英文，首字母不需要大写"
+        }
+    ]
+}`,
+            Amazon: `基于这个Amazon的品牌首页的内容:{url}
+提炼店铺的核心业务信息和所有产品信息，然后根据这些页面信息提供适用于谷歌广告投放的内容，要求包含：
+1、5条固定显示内容，品牌名+主打产品/核心业务/品牌特色，用英文，最多20个字符；
+2、18条不同侧重点的关键字标题，用英文，最多30个字符，并且标注每条广告标题的侧重点是什么，表格形式：侧重点、字符数、内容；
+3、8条不同角度或侧重点的description，用英文，最多88个字符，并且标注每条广告描述语的侧重点是什么，表格形式：侧重点、字符数、内容；
+4、40个适合投放的关键词，用英文，表格形式，要求关键词的搜索量不低于谷歌要求，字眼符合谷歌要求，至少要有1条是品牌名字，1条是产品名字。
+以上投放内容要严格审查规避谷歌广告要求的大写过多的问题、政策敏感字的问题等，确保谷歌广告审核通过！ 
+注意：生成的关键词，要求关键词对品牌业务、主打产品功能、品类、使用场景、目标用户、特色点、创新点、商品主要卖点等描述精确。从用户出发考虑用户可能的需要和决策，举例：Best+主打产品品类。关键词的搜索度要极尽所能的追求更高。
+【输出格式】
+必须是合法的 JSON 对象，不包含 Markdown 格式，对于内容中的特殊符号如双引号、单引号等在输出时注意使用转义：
+{
+    "pinned_headlines": [
+        {
+            "content": "固定展示内容，用英文"
+        }
+    ],
+    "headlines": [
+        {
+            "emphasis": "侧重点，用中文",
+            "char_count": 字符数(整数),
+            "content": "标题，用英文"
+        }
+    ],
+    "descriptions": [
+        {
+            "emphasis": "侧重点，用中文",
+            "char_count": 字符数(整数),
+            "content": "描述语，用英文"
+        }
+    ],
+    "keywords": [
+        {
+            "type": "关键词类别，用中文",
+            "content": "广告搜索关键词，用英文，首字母不需要大写"
+        }
+    ]
+}`,
+            AmazonDetail: `基于这个Amazon产品页的内容:{url}
+提炼落地页核心信息，然后根据这些页面信息提供适用于谷歌广告投放的内容，要求包含：
+1、5条固定显示内容，品牌名+产品名+特色信息/核心功能，用英文，最多20个字符；
+2、18条不同侧重点的关键字标题，用英文，最多30个字符，并且标注每条广告标题的侧重点是什么，表格形式：侧重点、字符数、内容）、
+3、8条不同角度或侧重点的description，用英文，最多88个字符，并且标注每条广告描述语的侧重点是什么，表格形式：侧重点、字符数、内容
+4、40个适合投放的关键词，用英文，表格形式，要求关键词的搜索量不低于谷歌要求，字眼符合谷歌要求，至少要有1条是品牌名字，1条是产品名字。
+以上投放内容要严格审查规避谷歌广告要求的大写过多的问题、政策敏感字的问题等，确保谷歌广告审核通过！ 
+注意：生成的关键词，要求关键词对产品功能、品类、使用场景、目标用户、特色点、创新点、商品主要卖点等描述精确。从用户出发考虑用户可能的需要和决策，举例：Best+产品品类。关键词的搜索度要极尽所能的追求更高。
+【输出格式】
+必须是合法的 JSON 对象，不包含 Markdown 格式，对于内容中的特殊符号如双引号、单引号等在输出时注意使用转义：
+{
+    "pinned_headlines": [
+        {
+            "content": "固定展示内容，用英文"
+        }
+    ],
+    "headlines": [
+        {
+            "emphasis": "侧重点，用中文",
+            "char_count": 字符数(整数),
+            "content": "标题，用英文"
+        }
+    ],
+    "descriptions": [
+        {
+            "emphasis": "侧重点，用中文",
+            "char_count": 字符数(整数),
+            "content": "描述语，用英文"
+        }
+    ],
+    "keywords": [
+        {
+            "type": "关键词类别，用中文",
+            "content": "广告搜索关键词，用英文，首字母不需要大写"
+        }
+    ]
+}`
+        };
+
         // 标签页切换
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -619,14 +741,13 @@
         const urlParts = document.getElementById('urlParts');
         const urlBase = document.getElementById('urlBase');
         const urlParams = document.getElementById('urlParams');
-        
-        // 原始模板文本
-        const originalTemplate = templateText.value;
+        const templateType = document.getElementById('templateType');
         
         // 从本地存储加载数据
         function loadFromLocalStorage() {
             const savedUrl = localStorage.getItem('adTool_url');
             const savedJson = localStorage.getItem('adTool_json');
+            const savedTemplateType = localStorage.getItem('adTool_templateType');
             
             if (savedUrl) {
                 urlInput.value = savedUrl;
@@ -636,12 +757,40 @@
             if (savedJson) {
                 jsonInput.value = savedJson;
             }
+            
+            if (savedTemplateType) {
+                templateType.value = savedTemplateType;
+                updateTemplateContent();
+            } else {
+                templateType.value = Object.keys(templates)[0];
+                updateTemplateContent();
+            }
         }
         
         // 保存数据到本地存储
         function saveToLocalStorage() {
             localStorage.setItem('adTool_url', urlInput.value);
             localStorage.setItem('adTool_json', jsonInput.value);
+            localStorage.setItem('adTool_templateType', templateType.value);
+        }
+        
+        // 更新模板内容
+        function updateTemplateContent() {
+            const selectedTemplate = templates[templateType.value];
+            const url = urlInput.value.trim();
+            
+            if (url) {
+                // 提取?之前的部分
+                let urlWithoutParams = url;
+                if (url.includes('?')) {
+                    urlWithoutParams = url.split('?')[0];
+                }
+                
+                // 替换模板中的{url}
+                templateText.value = selectedTemplate.replace(/{url}/g, urlWithoutParams);
+            } else {
+                templateText.value = selectedTemplate;
+            }
         }
         
         // 处理URL输入
@@ -656,9 +805,8 @@
                     paramsPart = '{lpurl}?' + url.split('?')[1];
                 }
                 
-                // 替换模板中的{url}
-                const updatedTemplate = originalTemplate.replace(/{url}/g, urlWithoutParams);
-                templateText.value = updatedTemplate;
+                // 更新模板内容
+                updateTemplateContent();
                 
                 // 显示URL解析结果
                 urlBase.textContent = urlWithoutParams;
@@ -669,7 +817,7 @@
                 copyTemplateBtn.classList.remove('hidden');
             } else {
                 // 恢复原始模板
-                templateText.value = originalTemplate;
+                updateTemplateContent();
                 copyTemplateBtn.classList.add('hidden');
                 urlParts.style.display = 'none';
             }
@@ -679,6 +827,12 @@
         urlInput.addEventListener('input', function() {
             const url = this.value.trim();
             processUrlInput(url);
+            saveToLocalStorage();
+        });
+        
+        // 监听模板类型变化
+        templateType.addEventListener('change', function() {
+            updateTemplateContent();
             saveToLocalStorage();
         });
         
