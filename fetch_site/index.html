@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>链接批量请求测试工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 25px 30px;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            opacity: 0.85;
+            font-size: 1rem;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .input-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            min-width: 100px;
+        }
+        
+        .number-input {
+            width: 120px;
+            padding: 12px 15px;
+            border: 2px solid #e1e5eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .number-input:focus {
+            border-color: #4b6cb7;
+            outline: none;
+        }
+        
+        .links-input {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            border: 2px solid #e1e5eb;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .links-input:focus {
+            border-color: #4b6cb7;
+            outline: none;
+        }
+        
+        .links-input::placeholder {
+            color: #999;
+        }
+        
+        .button-container {
+            margin-top: 20px;
+        }
+        
+        .send-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #4b6cb7 0%, #3a56a4 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .send-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #3a56a4 0%, #2c438f 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(58, 86, 164, 0.2);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        
+        .result-container.show {
+            max-height: 1000px;
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .result-box {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+            border: 2px solid #e1e5eb;
+            background-color: #f8f9fa;
+        }
+        
+        .success {
+            color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .error {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .status-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4b6cb7;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4b6cb7, #3a56a4);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .instructions {
+            background-color: #f0f4ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid #4b6cb7;
+        }
+        
+        .instructions h3 {
+            color: #182848;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .input-label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+            
+            .links-input {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>链接批量请求测试工具</h1>
+            <p class="subtitle">批量测试HTTP/HTTPS链接状态，支持循环请求和错误记录</p>
+        </header>
+        
+        <div class="content">
+            <div class="instructions">
+                <h3>使用说明</h3>
+                <ul>
+                    <li>在文本框中输入要测试的链接，每行一个（支持http和https）</li>
+                    <li>设置循环请求次数，将按顺序循环请求所有链接</li>
+                    <li>点击"发送请求"开始测试，非200状态码将被记录下来</li>
+                    <li>测试过程中不会中断，即使遇到错误也会继续测试</li>
+                </ul>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">循环请求次数：</label>
+                <input type="number" id="requestCount" class="number-input" min="1" max="100" value="1">
+            </div>
+            
+            <div class="input-group" style="flex-direction: column; align-items: flex-start; width: 100%;">
+                <label class="input-label">链接列表：</label>
+                <textarea id="linksInput" class="links-input" placeholder="请输入要测试的链接，每行一个，例如：
+https://api.example.com/test
+http://example.com/api
+https://jsonplaceholder.typicode.com/posts/1">https://jsonplaceholder.typicode.com/posts/1
+https://jsonplaceholder.typicode.com/posts/2
+https://jsonplaceholder.typicode.com/posts/3
+https://httpbin.org/status/404
+https://httpbin.org/status/500</textarea>
+            </div>
+            
+            <div class="button-container">
+                <button id="sendBtn" class="send-btn">
+                    <span id="btnText">发送请求</span>
+                    <div id="btnSpinner" class="spinner" style="display:none;"></div>
+                </button>
+            </div>
+            
+            <div class="progress-bar" style="display: none;">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="status-info" id="statusInfo" style="display: none;">
+                <div class="status-item">
+                    <span>总请求数：</span>
+                    <span id="totalRequests">0</span>
+                </div>
+                <div class="status-item">
+                    <span>已完成：</span>
+                    <span id="completedRequests">0</span>
+                </div>
+                <div class="status-item">
+                    <span>成功数：</span>
+                    <span id="successCount">0</span>
+                </div>
+                <div class="status-item">
+                    <span>失败数：</span>
+                    <span id="errorCount">0</span>
+                </div>
+            </div>
+            
+            <div class="result-container" id="resultContainer">
+                <div class="result-title" id="resultTitle"></div>
+                <textarea id="resultBox" class="result-box" readonly></textarea>
+            </div>
+        </div>
+        
+        <footer>
+            <p>链接批量请求测试工具 &copy; 2023 | 本工具在浏览器中直接运行，不会保存任何数据</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const linksInput = document.getElementById('linksInput');
+            const requestCountInput = document.getElementById('requestCount');
+            const sendBtn = document.getElementById('sendBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultBox = document.getElementById('resultBox');
+            const resultTitle = document.getElementById('resultTitle');
+            const progressBar = document.querySelector('.progress-bar');
+            const progressFill = document.getElementById('progressFill');
+            const statusInfo = document.getElementById('statusInfo');
+            const totalRequestsEl = document.getElementById('totalRequests');
+            const completedRequestsEl = document.getElementById('completedRequests');
+            const successCountEl = document.getElementById('successCount');
+            const errorCountEl = document.getElementById('errorCount');
+            
+            // 示例链接
+            const exampleLinks = [
+                'https://jsonplaceholder.typicode.com/posts/1',
+                'https://jsonplaceholder.typicode.com/posts/2',
+                'https://jsonplaceholder.typicode.com/posts/3',
+                'https://httpbin.org/status/404',
+                'https://httpbin.org/status/500'
+            ];
+            
+            // 初始化示例链接
+            linksInput.value = exampleLinks.join('\n');
+            
+            // 发送请求
+            sendBtn.addEventListener('click', async function() {
+                // 获取输入
+                const linksText = linksInput.value.trim();
+                const count = parseInt(requestCountInput.value) || 1;
+                
+                if (!linksText) {
+                    alert('请输入要测试的链接');
+                    return;
+                }
+                
+                if (count < 1 || count > 100) {
+                    alert('请求次数必须在1-100之间');
+                    return;
+                }
+                
+                // 解析链接列表
+                const links = linksText.split('\n')
+                    .map(link => link.trim())
+                    .filter(link => link && (link.startsWith('http://') || link.startsWith('https://')));
+                
+                if (links.length === 0) {
+                    alert('未找到有效的HTTP/HTTPS链接');
+                    return;
+                }
+                
+                // 更新UI状态
+                sendBtn.disabled = true;
+                btnText.textContent = '请求进行中...';
+                btnSpinner.style.display = 'block';
+                resultContainer.classList.remove('show');
+                resultBox.value = '';
+                progressBar.style.display = 'block';
+                statusInfo.style.display = 'block';
+                
+                // 计算总请求数
+                const totalRequests = links.length * count;
+                let completedRequests = 0;
+                let successCount = 0;
+                let errorCount = 0;
+                const errors = [];
+                
+                // 更新状态显示
+                totalRequestsEl.textContent = totalRequests;
+                completedRequestsEl.textContent = completedRequests;
+                successCountEl.textContent = successCount;
+                errorCountEl.textContent = errorCount;
+                
+                // 执行请求
+                try {
+                    for (let i = 0; i < count; i++) {
+                        for (let j = 0; j < links.length; j++) {
+                            const link = links[j];
+                            
+                            try {
+                                // 使用fetch API发送请求
+                                const response = await fetch(link, {
+                                    method: 'GET',
+                                    mode: 'cors', // 允许跨域请求
+                                    cache: 'no-cache',
+                                    headers: {
+                                        'Accept': 'application/json, text/plain, */*',
+                                        'User-Agent': 'LinkTester/1.0'
+                                    }
+                                });
+                                
+                                completedRequests++;
+                                
+                                if (response.status === 200) {
+                                    successCount++;
+                                } else {
+                                    errorCount++;
+                                    errors.push({
+                                        url: link,
+                                        status: response.status,
+                                        message: `HTTP ${response.status}: ${response.statusText}`
+                                    });
+                                }
+                            } catch (error) {
+                                completedRequests++;
+                                errorCount++;
+                                errors.push({
+                                    url: link,
+                                    status: 'Error',
+                                    message: error.message || '请求失败'
+                                });
+                            }
+                            
+                            // 更新进度
+                            const progress = (completedRequests / totalRequests) * 100;
+                            progressFill.style.width = `${progress}%`;
+                            
+                            // 更新状态
+                            completedRequestsEl.textContent = completedRequests;
+                            successCountEl.textContent = successCount;
+                            errorCountEl.textContent = errorCount;
+                        }
+                    }
+                    
+                    // 请求完成，显示结果
+                    if (errors.length === 0) {
+                        resultTitle.innerHTML = '<span style="color:#28a745">✓</span> 所有请求成功完成';
+                        resultBox.className = 'result-box success';
+                        resultBox.value = `所有 ${totalRequests} 个请求均成功完成，状态码均为200。\n\n请求详情：\n- 总请求数: ${totalRequests}\n- 成功: ${successCount}\n- 失败: ${errorCount}\n- 开始时间: ${new Date().toLocaleString()}\n- 完成时间: ${new Date().toLocaleString()}`;
+                    } else {
+                        resultTitle.innerHTML = `<span style="color:#dc3545">✗</span> 发现 ${errors.length} 个错误`;
+                        resultBox.className = 'result-box error';
+                        
+                        let errorText = `共完成 ${totalRequests} 个请求，其中 ${successCount} 个成功，${errorCount} 个失败。\n\n错误详情：\n`;
+                        
+                        errors.forEach((error, index) => {
+                            errorText += `\n${index + 1}. URL: ${error.url}\n   状态: ${error.status}\n   信息: ${error.message}\n`;
+                        });
+                        
+                        errorText += `\n统计信息：\n- 总请求数: ${totalRequests}\n- 成功: ${successCount}\n- 失败: ${errorCount}\n- 开始时间: ${new Date().toLocaleString()}\n- 完成时间: ${new Date().toLocaleString()}`;
+                        
+                        resultBox.value = errorText;
+                    }
+                    
+                } catch (error) {
+                    console.error('请求过程中发生错误:', error);
+                    resultTitle.innerHTML = '<span style="color:#dc3545">✗</span> 请求过程中发生错误';
+                    resultBox.className = 'result-box error';
+                    resultBox.value = `请求过程中发生错误：${error.message}\n\n请检查网络连接或链接格式是否正确。`;
+                } finally {
+                    // 恢复UI状态
+                    sendBtn.disabled = false;
+                    btnText.textContent = '发送请求';
+                    btnSpinner.style.display = 'none';
+                    resultContainer.classList.add('show');
+                    
+                    // 滚动到结果区域
+                    resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+            
+            // 添加键盘快捷键
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+Enter 或 Cmd+Enter 发送请求
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    sendBtn.click();
+                }
+            });
+            
+            // 添加示例链接提示
+            const textarea = document.getElementById('linksInput');
+            textarea.addEventListener('focus', function() {
+                if (this.value === exampleLinks.join('\n')) {
+                    this.setSelectionRange(0, this.value.length);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
