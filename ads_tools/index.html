@@ -513,7 +513,8 @@
                 <div class="info-message">
                     提示：输入链接后，系统会自动提取?之前的部分，并替换模板中的{url}占位符
                 </div>
-                
+                <input type="text" id="urlInput2" class="url-input" placeholder="Amazon首页链接才需要填写，例如：https://www.amazon.com/stores/MYSUNTOWN/page/7CD16A10-5723-470B-BA89-7A0B420A145E">
+
                 <!-- URL解析结果显示区域 -->
                 <div id="urlParts" class="url-parts">
                     <div class="url-part">
@@ -735,6 +736,7 @@
         
         // 第一个标签页功能
         const urlInput = document.getElementById('urlInput');
+        const urlInput2 = document.getElementById('urlInput2');
         const templateText = document.getElementById('templateText');
         const copyTemplateBtn = document.getElementById('copyTemplateBtn');
         const copySuccess = document.getElementById('copySuccess');
@@ -746,12 +748,17 @@
         // 从本地存储加载数据
         function loadFromLocalStorage() {
             const savedUrl = localStorage.getItem('adTool_url');
+            const savedUrl2 = localStorage.getItem('adTool_url2');
             const savedJson = localStorage.getItem('adTool_json');
             const savedTemplateType = localStorage.getItem('adTool_templateType');
             
             if (savedUrl) {
                 urlInput.value = savedUrl;
                 processUrlInput(savedUrl);
+            }
+
+            if (savedUrl2) {
+                urlInput2.value = savedUrl2;
             }
             
             if (savedJson) {
@@ -770,6 +777,7 @@
         // 保存数据到本地存储
         function saveToLocalStorage() {
             localStorage.setItem('adTool_url', urlInput.value);
+            localStorage.setItem('adTool_url2', urlInput2.value);
             localStorage.setItem('adTool_json', jsonInput.value);
             localStorage.setItem('adTool_templateType', templateType.value);
         }
@@ -778,6 +786,7 @@
         function updateTemplateContent() {
             const selectedTemplate = templates[templateType.value];
             const url = urlInput.value.trim();
+            const url2 = urlInput2.value.trim();
             
             if (url) {
                 // 提取?之前的部分
@@ -787,7 +796,10 @@
                 }
                 
                 // 替换模板中的{url}
-                templateText.value = selectedTemplate.replace(/{url}/g, urlWithoutParams);
+                if(url2)
+                    templateText.value = selectedTemplate.replace(/{url}/g, url2);
+                else
+                    templateText.value = selectedTemplate.replace(/{url}/g, urlWithoutParams);
             } else {
                 templateText.value = selectedTemplate;
             }
@@ -827,6 +839,12 @@
         urlInput.addEventListener('input', function() {
             const url = this.value.trim();
             processUrlInput(url);
+            saveToLocalStorage();
+        });
+
+        urlInput2.addEventListener('input', function() {
+            const url2 = this.value.trim();
+            updateTemplateContent();
             saveToLocalStorage();
         });
         
