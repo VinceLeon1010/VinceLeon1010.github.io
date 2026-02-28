@@ -896,7 +896,7 @@
             btn.addEventListener('click', function() {
                 const targetId = this.getAttribute('data-target');
                 const content = document.getElementById(targetId).textContent;
-                copyToClipboard(content);
+                copyToClipboard(cleanString(content));
             });
         });
         
