@@ -804,7 +804,26 @@
                 templateText.value = selectedTemplate;
             }
         }
-        
+
+        function cleanString(str) {
+            if (!str) return str;
+            // 1. 解码URL编码字符（如 %20 转为空格）
+            try {
+                str = decodeURIComponent(str);
+            } catch (e) {
+                // 如果解码失败（如非标准URL编码），则忽略，尝试后续清理
+                console.warn('URL解码失败，将进行基础清理:' + e);
+            }
+            // 2. 使用正则表达式移除 ASCII 控制字符 (0-31 和 127)
+            // 这可以消除不可见字符，如退格(BS)、换行(LF)等
+            str = str.replace('/[\x00-\x1F\x7F]/g', '');
+            // 3. 可选：移除 UTF-8 BOM 字符 (U+FEFF)
+            str = str.replace('/^\uFEFF/', '');
+            // 4. 可选：去除字符串首尾的空白字符
+            str = str.trim();
+            return str;
+        }
+
         // 处理URL输入
         function processUrlInput(url) {
             if (url) {
@@ -821,8 +840,8 @@
                 updateTemplateContent();
                 
                 // 显示URL解析结果
-                urlBase.textContent = urlWithoutParams;
-                urlParams.textContent = paramsPart || '(无参数)';
+                urlBase.textContent = cleanString(urlWithoutParams);
+                urlParams.textContent = (cleanString(paramsPart)) || '(无参数)';
                 urlParts.style.display = 'block';
                 
                 // 显示复制按钮
