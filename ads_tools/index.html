@@ -538,7 +538,9 @@
                     <label for="templateType"><i class="fas fa-file-code"></i> 选择模板类型：</label>
                     <select id="templateType" class="template-dropdown">
                         <option value="Kickstarter">KickStarter模板（用于Gemini）</option>
+                        <option value="Kickstarter2">KickStarter模板2（用于Gemini，由WorkBuddy PPC竞价广告策略专家编写）</option>
                         <option value="Amazon">Amazon商家页模板（用于ChatGPT）</option>
+                        <option value="Amazon2">Amazon商家页模板2（用于ChatGPT，由WorkBuddy PPC竞价广告策略专家编写）</option>
                         <option value="AmazonDetail">Amazon产品页模板（用于ChatGPT）</option>
                     </select>
                 </div>
@@ -645,6 +647,112 @@
         }
     ]
 }`,
+            Kickstarter2: `You are a senior Google Ads copywriter and PPC strategist specializing in affiliate marketing for Kickstarter campaigns. Your goal is to maximize CTR (click-through rate) and conversion rate for affiliate traffic sent to Kickstarter product pages.
+
+Analyze the Kickstarter campaign page at: {url}
+
+Step 1 — Extract core intelligence:
+- Product name and category
+- Primary value proposition (what problem does it solve?)
+- Key features and differentiators (vs. alternatives)
+- Target audience (who would search for this?)
+- Price point or pledge tier (if visible)
+- Social proof signals (backers count, funding percentage, press mentions)
+- Any urgency signals (limited early bird, campaign end date)
+
+Step 2 — Identify search intent layers:
+- Transactional intent: users ready to buy or back ("buy [product]", "get [product]", "order [product]")
+- Comparative intent: users evaluating options ("best [product type]", "[product] vs [alternative]", "[product] review")
+- Informational/discovery intent: users learning about the problem ("best [solution category]", "how to [solve problem]")
+
+Step 3 — Generate Google Ads content. All content must:
+- Be written in English
+- Use Title Case (capitalize main words, NOT all caps)
+- Use maximum ONE exclamation mark across all content
+- Avoid policy-sensitive words: guarantee, #1, best ever, free (unless literally true), cure, miracle, unlimited, earn money fast
+- Avoid vague crowdfunding terms (e.g., Kickstarter project, crowdfunding campaign, back this project)
+- Be factually grounded in the page content — do not invent claims
+
+Generate the following:
+
+**1. Pinned Headlines (5 items)**
+- Format: [Product Name] + [Core feature or benefit]
+- Max 20 characters each
+- These are always shown — make them brand-anchoring and recognition-focused
+
+**2. Ad Headlines (18 items)**
+- Max 30 characters each
+- Cover these emphasis angles (at least one each): 
+  - Primary benefit / pain-point solved
+  - Key feature highlight
+  - Social proof / traction (backers/funding)
+  - Urgency / scarcity (early bird, limited)
+  - Price / value
+  - Comparison / differentiation
+  - CTA-driven (action verb: Get, Try, Order, Discover, Shop)
+  - Problem-aware (question format: Tired of...? Looking for...?)
+  - Target audience specific
+  - Brand name + core promise
+- Headlines must naturally include high-volume keywords identified in Step 2
+- Vary sentence structure: some short punchy (under 20 chars), some use full 30 chars
+
+**3. Descriptions (8 items)**
+- Max 88 characters each
+- Must include at least one of: urgency, social proof, specific benefit, CTA
+- Each description must take a distinctly different angle — do NOT repeat the same benefit twice
+- Cover these angles (at least one each):
+  - Lead with problem → solution
+  - Lead with social proof → CTA
+  - Lead with feature → benefit → CTA
+  - Lead with urgency → offer → CTA
+  - Lead with target audience identification
+  - Lead with comparison/differentiation
+  - Lead with price/value anchor
+  - Lead with question hook
+
+**4. Keywords (40 items)**
+- English only, lowercase
+- Must include: at least 1 exact brand name keyword, at least 1 exact product name keyword
+- Mix match types coverage (label each): exact match targets, phrase match targets, broad modifier targets
+- Organize by search intent: transactional (buy/order/get), comparative (best/vs/review/alternative), discovery (what is/how to/[problem keyword])
+- Minimum viable search volume: target keywords with estimated monthly searches >100 on Google
+- Forbidden: any keyword containing kickstarter, crowdfunding, indiegogo, or funding platform names
+- Keyword formats to include:
+  - [product name] + action (buy, get, order, review)
+  - [problem] + solution format
+  - [product category] + qualifier (best, top, portable, wireless, etc.)
+  - [competitor category] + alternative
+  - [audience] + [need] format
+
+Output ONLY a valid JSON object. No markdown formatting, no code blocks, no explanation text before or after. Escape all special characters (double quotes, single quotes, apostrophes) within string values.
+
+{
+    "pinned_headlines": [
+        {
+            "content": "英文固定标题"
+        }
+    ],
+    "headlines": [
+        {
+            "emphasis": "侧重点（中文）",
+            "char_count": 字符数整数,
+            "content": "英文标题"
+        }
+    ],
+    "descriptions": [
+        {
+            "emphasis": "侧重点（中文）",
+            "char_count": 字符数整数,
+            "content": "英文描述"
+        }
+    ],
+    "keywords": [
+        {
+            "type": "关键词类别（中文）",
+            "content": "英文关键词"
+        }
+    ]
+}`,
             Amazon: `基于这个Amazon的品牌首页的内容:{url}
 提炼店铺的核心业务信息和所有产品信息，然后根据这些页面信息提供适用于Google Ads投放的内容，要求包含：
 1、5条固定显示内容，品牌名+主打产品/核心业务/品牌特色，要求最适合投Amazon产品投放的关键词结构。用英文，最多20个字符；
@@ -679,6 +787,151 @@
         {
             "type": "关键词类别，用中文",
             "content": "广告搜索关键词，用英文"
+        }
+    ]
+}`,
+            Amazon2: `# 角色定位
+你是一位专精于Amazon联盟客Google Ads投放的高级付费搜索广告策略师，深度熟悉宠物用品、消费电子、家居等品类的高CTR文案技巧和Quality Score优化逻辑。
+
+# 任务说明
+我是Amazon联盟客，需要你基于以下Amazon店铺页面，自动提取品牌信息并生成一套完整的Google Ads搜索广告内容。
+
+## 店铺页面链接
+{url}
+
+---
+
+# 第一步：提取品牌情报（内部推理，不需要输出）
+访问上方链接，识别以下信息，作为后续广告内容生成的依据：
+- 品牌名称
+- 核心产品线（所有可见品类）
+- 每个产品的核心功能卖点（前3条）
+- 品牌核心差异化（与同类竞品相比的独特优势）
+- 目标用户画像（年龄/生活方式/使用场景）
+- 价格区间定位（入门/中端/高端）
+- 现有评分/评价数量（如可见）
+
+---
+
+# 第二步：生成Google Ads广告内容
+
+基于第一步提取的品牌情报，生成以下全部内容：
+
+## 输出要求
+
+### Part 1：固定展示内容 Pinned Headlines（5条）
+规则：
+- 格式：品牌名 + 核心产品或品牌特色
+- 字符数：≤20个字符（含空格）
+- 语言：英文
+- 选用该品类在Amazon/Google高频搜索的关键词结构
+- 仅首字母大写，禁止全大写单词
+
+### Part 2：广告标题 Headlines（18条）
+规则：
+- 字符数：≤30个字符（含空格），每条精确计算
+- 语言：英文
+- 18条必须覆盖以下全部8个维度（每个维度至少2条）：
+  1. 品牌词 + 产品词
+  2. 核心功能卖点
+  3. 用户痛点解决
+  4. 价格价值主张（如Free Shipping / Sale / % Off）
+  5. 社会认同（评分数量 / 用户数）
+  6. 竞品对比暗示（Top-Rated / Best / #1 Alternative）
+  7. 场景化需求（使用场景具体描述）
+  8. 行动召唤（Shop Now / Buy Today / Get Yours）
+- 高CTR技巧要求：
+  * 出现具体数字（如"4.8 Stars"、"50K+ Buyers"）
+  * 植入该品类Top 100高搜索量关键词
+  * 善用价值锚点词（"Official Store"、"Prime Deal"、"Limited"）
+
+### Part 3：广告描述语 Descriptions（8条）
+规则：
+- 字符数：≤70个字符（含空格），每条精确计算
+- 语言：英文
+- 采用 Hook（钩子）+ Value（价值主张）+ CTA（行动号召）三段式结构
+- 8条必须覆盖以下8种受众心理触发点（各1条）：
+  1. 功能痛点解决型
+  2. 社会认同型（评价/用户量）
+  3. 限时紧迫感型
+  4. 竞品对比优势型
+  5. 健康/安全/情感诉求型
+  6. 科技创新型
+  7. 性价比型
+  8. 场景代入型
+- 每条描述需独特，避免套话，体现真实产品差异化
+
+### Part 4：关键词矩阵 Keywords
+生成规则：
+- 所有关键词推测月搜索量 ≥1,000（Google Ads可投放量级）
+- 语言：英文，2-4词组合，避免单词过于宽泛
+- 覆盖商业搜索意图（buy/best/review/cheap/vs等）
+- 每条标注推荐匹配类型：精确匹配 / 短语匹配 / 广泛匹配+智能出价
+
+分类与数量：
+1. 【品牌精准词】1条 - 品牌名精确匹配
+2. 【品牌+核心产品】1条 - 品牌名+最高销量产品名
+3. 【品牌+购买意图】6条 - buy/shop/best/deal/review/coupon等意图词+品牌
+4. 【产品线专项A】6条 - 第一大产品线的精准搜索词
+5. 【产品线专项B】6条 - 第二大产品线的精准搜索词（如有）
+6. 【产品线专项C】6条 - 第三大产品线的精准搜索词（如有）
+7. 【决策辅助与对比意图】6条 - best/vs/top rated/worth it/review等
+8. 【场景化购买意图】6条 - 基于具体使用场景（忙碌生活/特定人群/特定需求）
+
+---
+
+# Google Ads合规强制要求（逐条检查，必须全部通过）
+在输出前，对所有内容执行以下审查清单：
+
+☑ 标题字符数 ≤30，描述字符数 ≤70（精确计算，含空格）
+☑ 禁止全大写单词（"FREE"→"Free"，"SHOP"→"Shop"）
+☑ 感叹号全文最多出现1次
+☑ 禁止绝对化语言（"#1 in the world"→"Top-Rated"）
+☑ 禁止夸大保证词（"guaranteed"、"miracle"、"100% cure"）
+☑ 禁止出现竞争对手品牌名
+☑ 禁止价格虚假承诺（如"Lowest Price"无法核实）
+☑ 禁止政策敏感词（医疗声明、虚假折扣等）
+☑ 关键词与广告标题语义相关，确保Quality Score信号一致
+
+---
+
+# 输出格式
+必须是合法的JSON对象，不含任何Markdown格式或代码块标记，特殊符号（双引号、单引号、&符号等）使用标准JSON转义处理：
+
+{
+    "brand_summary": {
+        "brand_name": "品牌名",
+        "core_products": ["产品线1", "产品线2", "产品线3"],
+        "key_differentiator": "核心差异化一句话总结",
+        "target_audience": "目标用户描述"
+    },
+    "pinned_headlines": [
+        {
+            "char_count": 字符数,
+            "content": "固定展示内容（英文）"
+        }
+    ],
+    "headlines": [
+        {
+            "emphasis": "侧重点（中文）",
+            "dimension": "所属维度（中文）",
+            "char_count": 字符数,
+            "content": "标题（英文）"
+        }
+    ],
+    "descriptions": [
+        {
+            "emphasis": "侧重点（中文）",
+            "trigger": "心理触发点类型（中文）",
+            "char_count": 字符数,
+            "content": "描述语（英文）"
+        }
+    ],
+    "keywords": [
+        {
+            "type": "关键词类别（中文）",
+            "match_type": "推荐匹配类型（中文）",
+            "content": "关键词（英文）"
         }
     ]
 }`,
