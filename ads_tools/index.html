@@ -658,7 +658,7 @@ Step 1 — Extract core intelligence:
 - Target audience (who would search for this?)
 - Price point or pledge tier (if visible)
 - Social proof signals (backers count, funding percentage, press mentions)
-- Any urgency signals (limited early bird, campaign end date)
+- Any scarcity signals (limited reward tiers, limited units, early bird pricing)
 
 Step 2 — Identify search intent layers:
 - Transactional intent: users ready to buy or back ("buy [product]", "get [product]", "order [product]")
@@ -668,7 +668,9 @@ Step 2 — Identify search intent layers:
 Step 3 — Generate Google Ads content. All content must:
 - Be written in English
 - Use Title Case (capitalize main words, NOT all caps)
-- Use maximum ONE exclamation mark across all content
+- Use maximum ONE exclamation mark across ALL generated content combined
+- Avoid countdown or time-specific urgency language (do NOT use: "X days left", "ends soon", "last chance today", "limited time offer", or any phrasing that implies a specific deadline) — these ads run continuously and such claims become inaccurate
+- Instead, express urgency through: limited availability ("Limited Units"), tier scarcity ("Early Bird Tier"), exclusivity ("Exclusive Backer Deal"), or milestone-based framing ("Funding Now")
 - Avoid policy-sensitive words: guarantee, #1, best ever, free (unless literally true), cure, miracle, unlimited, earn money fast
 - Avoid vague crowdfunding terms (e.g., Kickstarter project, crowdfunding campaign, back this project)
 - Be factually grounded in the page content — do not invent claims
@@ -682,49 +684,50 @@ Generate the following:
 
 **2. Ad Headlines (18 items)**
 - Max 30 characters each
-- Cover these emphasis angles (at least one each): 
+- Cover these emphasis angles (at least one each):
   - Primary benefit / pain-point solved
   - Key feature highlight
-  - Social proof / traction (backers/funding)
-  - Urgency / scarcity (early bird, limited)
-  - Price / value
-  - Comparison / differentiation
-  - CTA-driven (action verb: Get, Try, Order, Discover, Shop)
-  - Problem-aware (question format: Tired of...? Looking for...?)
+  - Social proof / traction (backers count, overfunded percentage)
+  - Scarcity without countdown (limited units, limited tiers, exclusive access)
+  - Price / value anchor
+  - Comparison / differentiation vs. mainstream alternatives
+  - CTA-driven (action verb: Get, Try, Order, Discover, Shop, Claim)
+  - Problem-aware hook (question format: Tired of...? Looking for...?)
   - Target audience specific
   - Brand name + core promise
 - Headlines must naturally include high-volume keywords identified in Step 2
-- Vary sentence structure: some short punchy (under 20 chars), some use full 30 chars
+- Vary sentence structure: some short and punchy (under 20 chars), some use the full 30 chars
 
 **3. Descriptions (8 items)**
 - Max 88 characters each
-- Must include at least one of: urgency, social proof, specific benefit, CTA
 - Each description must take a distinctly different angle — do NOT repeat the same benefit twice
-- Cover these angles (at least one each):
-  - Lead with problem → solution
-  - Lead with social proof → CTA
-  - Lead with feature → benefit → CTA
-  - Lead with urgency → offer → CTA
-  - Lead with target audience identification
-  - Lead with comparison/differentiation
-  - Lead with price/value anchor
-  - Lead with question hook
+- Must include at least one of per description: scarcity signal, social proof, specific benefit, CTA
+- Do NOT use countdown language or date-specific urgency in any description
+- Cover these angles (one each):
+  - Problem → solution → CTA
+  - Social proof → benefit → CTA
+  - Feature → outcome → CTA
+  - Scarcity signal (limited units/tiers) → CTA
+  - Target audience identification → benefit → CTA
+  - Comparison / differentiation → CTA
+  - Price / value anchor → CTA
+  - Question hook → answer → CTA
 
 **4. Keywords (40 items)**
-- English only, lowercase
+- English only, all lowercase
 - Must include: at least 1 exact brand name keyword, at least 1 exact product name keyword
-- Mix match types coverage (label each): exact match targets, phrase match targets, broad modifier targets
-- Organize by search intent: transactional (buy/order/get), comparative (best/vs/review/alternative), discovery (what is/how to/[problem keyword])
-- Minimum viable search volume: target keywords with estimated monthly searches >100 on Google
-- Forbidden: any keyword containing kickstarter, crowdfunding, indiegogo, or funding platform names
+- Label each keyword's match type intent: 精确匹配 / 词组匹配 / 广泛匹配
+- Organize by search intent: transactional (buy/order/get/shop), comparative (best/vs/review/alternative), discovery (what is/how to/[problem keyword])
+- Target keywords with estimated monthly searches >100 on Google
+- Forbidden: any keyword containing kickstarter, crowdfunding, indiegogo, or any funding platform name
 - Keyword formats to include:
-  - [product name] + action (buy, get, order, review)
+  - [product name] + action verb (buy, get, order, review)
   - [problem] + solution format
-  - [product category] + qualifier (best, top, portable, wireless, etc.)
+  - [product category] + qualifier (best, top, portable, wireless, smart, etc.)
   - [competitor category] + alternative
   - [audience] + [need] format
 
-Output ONLY a valid JSON object. No markdown formatting, no code blocks, no explanation text before or after. Escape all special characters (double quotes, single quotes, apostrophes) within string values.
+Output ONLY a valid JSON object. No markdown formatting, no code blocks, no explanation text before or after the JSON. Escape all special characters (double quotes, apostrophes) within string values using backslash.
 
 {
     "pinned_headlines": [
