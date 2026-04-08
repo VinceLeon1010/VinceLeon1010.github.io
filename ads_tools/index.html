@@ -793,151 +793,259 @@ Output ONLY a valid JSON object. No markdown formatting, no code blocks, no expl
         }
     ]
 }`,
-            Amazon2: `# 角色定位
-你是一位专精于Amazon联盟客Google Ads投放的高级付费搜索广告策略师，深度熟悉宠物用品、消费电子、家居等品类的高CTR文案技巧和Quality Score优化逻辑。
+            Amazon2: `You are a senior Google Ads PPC strategist specializing in Amazon affiliate marketing. Your expertise covers pet supplies, consumer electronics, home goods, and multi-category Amazon storefronts. Your primary goal is to generate ad content that achieves high Quality Score, strong CTR, and affiliate conversion.
 
-# 任务说明
-我是Amazon联盟客，需要你基于以下Amazon店铺页面，自动提取品牌信息并生成一套完整的Google Ads搜索广告内容。
-
-## 店铺页面链接
+## Store URL
 {url}
 
 ---
 
-# 第一步：提取品牌情报（内部推理，不需要输出）
-访问上方链接，识别以下信息，作为后续广告内容生成的依据：
-- 品牌名称
-- 核心产品线（所有可见品类）
-- 每个产品的核心功能卖点（前3条）
-- 品牌核心差异化（与同类竞品相比的独特优势）
-- 目标用户画像（年龄/生活方式/使用场景）
-- 价格区间定位（入门/中端/高端）
-- 现有评分/评价数量（如可见）
+## Step 1 — Brand Intelligence Extraction (internal reasoning, do not output)
+
+Visit the URL above and extract:
+- Brand name (exact spelling as shown on Amazon)
+- All visible product lines / categories (list every distinct category you can identify)
+- For each product line: top 3 functional features or selling points
+- Brand differentiators vs. generic Amazon alternatives (e.g., patented design, vet-approved, premium materials)
+- Target audience profile (lifestyle, use case, demographic signals)
+- Price positioning (budget / mid-range / premium — based on visible price points)
+- Social proof signals (star rating, number of reviews, "Amazon's Choice" or "Best Seller" badge if visible)
+- Most reviewed / best-selling product (this becomes the anchor product for ad copy)
 
 ---
 
-# 第二步：生成Google Ads广告内容
+## Step 2 — Keyword Architecture Planning (internal reasoning, do not output)
 
-基于第一步提取的品牌情报，生成以下全部内容：
+Before writing any ad copy, map out the keyword universe using this framework:
 
-## 输出要求
+**Identify the anchor product** (highest reviews or "Best Seller" tagged item).
 
-### Part 1：固定展示内容 Pinned Headlines（5条）
-规则：
-- 格式：品牌名 + 核心产品或品牌特色
-- 字符数：≤20个字符（含空格）
-- 语言：英文
-- 选用该品类在Amazon/Google高频搜索的关键词结构
-- 仅首字母大写，禁止全大写单词
+**Match Type Assignment Rules — apply these strictly:**
 
-### Part 2：广告标题 Headlines（18条）
-规则：
-- 字符数：≤30个字符（含空格），每条精确计算
-- 语言：英文
-- 18条必须覆盖以下全部8个维度（每个维度至少2条）：
-  1. 品牌词 + 产品词
-  2. 核心功能卖点
-  3. 用户痛点解决
-  4. 价格价值主张（如Free Shipping / Sale / % Off）
-  5. 社会认同（评分数量 / 用户数）
-  6. 竞品对比暗示（Top-Rated / Best / #1 Alternative）
-  7. 场景化需求（使用场景具体描述）
-  8. 行动召唤（Shop Now / Buy Today / Get Yours）
-- 高CTR技巧要求：
-  * 出现具体数字（如"4.8 Stars"、"50K+ Buyers"）
-  * 植入该品类Top 100高搜索量关键词
-  * 善用价值锚点词（"Official Store"、"Prime Deal"、"Limited"）
+EXACT MATCH [精确匹配]:
+- Use for: high-commercial-intent phrases where the user is clearly ready to buy
+- Pattern: buy + [specific product], [brand name] + [product], order + [specific product]
+- Goal: protect budget, only trigger on highly relevant searches
+- Volume expectation: lower volume, higher conversion rate
 
-### Part 3：广告描述语 Descriptions（8条）
-规则：
-- 字符数：≤70个字符（含空格），每条精确计算
-- 语言：英文
-- 采用 Hook（钩子）+ Value（价值主张）+ CTA（行动号召）三段式结构
-- 8条必须覆盖以下8种受众心理触发点（各1条）：
-  1. 功能痛点解决型
-  2. 社会认同型（评价/用户量）
-  3. 限时紧迫感型
-  4. 竞品对比优势型
-  5. 健康/安全/情感诉求型
-  6. 科技创新型
-  7. 性价比型
-  8. 场景代入型
-- 每条描述需独特，避免套话，体现真实产品差异化
+PHRASE MATCH [短语匹配]:
+- Use for: research and comparison-stage queries where word order matters
+- Pattern: best + [product type], [product type] + review, [product type] + for + [use case]
+- Goal: capture mid-funnel users who are evaluating options
+- Volume expectation: medium volume, medium conversion rate
 
-### Part 4：关键词矩阵 Keywords
-生成规则：
-- 所有关键词推测月搜索量 ≥1,000（Google Ads可投放量级）
-- 语言：英文，2-4词组合，避免单词过于宽泛
-- 覆盖商业搜索意图（buy/best/review/cheap/vs等）
-- 每条标注推荐匹配类型：精确匹配 / 短语匹配 / 广泛匹配+智能出价
+BROAD MATCH [广泛匹配]:
+- Use ONLY when paired with Smart Bidding (tCPA or tROAS)
+- Use for: problem-aware and discovery-stage queries
+- Pattern: [problem description], [use case] + [need], how to + [problem]
+- Goal: discover new converting search terms via Google's signal learning
+- Volume expectation: highest volume, lowest initial conversion — needs learning period
+- WARNING: Do NOT use broad match for brand keywords (brand terms must be exact match only)
 
-分类与数量：
-1. 【品牌精准词】1条 - 品牌名精确匹配
-2. 【品牌+核心产品】1条 - 品牌名+最高销量产品名
-3. 【品牌+购买意图】6条 - buy/shop/best/deal/review/coupon等意图词+品牌
-4. 【产品线专项A】6条 - 第一大产品线的精准搜索词
-5. 【产品线专项B】6条 - 第二大产品线的精准搜索词（如有）
-6. 【产品线专项C】6条 - 第三大产品线的精准搜索词（如有）
-7. 【决策辅助与对比意图】6条 - best/vs/top rated/worth it/review等
-8. 【场景化购买意图】6条 - 基于具体使用场景（忙碌生活/特定人群/特定需求）
+**Build keyword clusters using these structurally validated high-intent patterns:**
+
+Cluster A — Brand Intent (6 keywords):
+Exact match only for pure brand terms. Phrase match for brand + modifier combinations.
+- [brand name] → 精确匹配
+- [brand name] + [product type] → 精确匹配
+- [brand name] + review → 短语匹配
+- [brand name] + vs + [generic category] → 短语匹配
+- [brand name] + discount / deal / coupon → 短语匹配
+- where to buy + [brand name] → 精确匹配
+
+Cluster B — Product-Specific High Intent (12 keywords):
+Mix of exact and phrase match. These users know what they want.
+- buy + [specific product name] → 精确匹配
+- [specific product name] + review → 短语匹配
+- best + [specific product type] → 短语匹配
+- best + [specific product type] + for + [primary use case] → 短语匹配
+- [specific product type] + [year] (e.g., "best dog GPS 2026") → 短语匹配
+- [specific product type] + under + [price point] → 精确匹配
+- [specific product type] + vs + [known alternative type] → 短语匹配
+- affordable + [specific product type] → 短语匹配
+- [specific product type] + for + [specific audience] → 短语匹配
+- top rated + [specific product type] → 短语匹配
+- [specific product type] + deal → 精确匹配
+- [specific product type] + sale → 精确匹配
+
+Cluster C — Problem-Solution Discovery (10 keywords):
+Primarily broad match to capture problem-aware users. These users describe symptoms, not products.
+- how to + [solve the core problem this product addresses] → 广泛匹配
+- best + [solution category] + for + [specific problem] → 广泛匹配
+- [problem keyword] + solution → 广泛匹配
+- [specific use case] + [product type] → 广泛匹配
+- [audience] + needs + [product type] → 广泛匹配
+- [problem] + without + [undesired side effect] → 广泛匹配
+- [product type] + that + [solves specific problem] → 广泛匹配
+- why + [problem happens] → 广泛匹配
+- [product type] + for beginners → 短语匹配
+- [product type] + easy to use → 广泛匹配
+
+Cluster D — Competitor Category Conquest (6 keywords):
+Phrase match for comparison queries. Never use exact competitor brand names.
+- [product type] + alternative → 短语匹配
+- [product type] + comparison → 短语匹配
+- [product type] + worth it → 短语匹配
+- [product type] + pros and cons → 短语匹配
+- better + [product type] → 短语匹配
+- [product category] + which is best → 广泛匹配
+
+Cluster E — Long-Tail High-Conversion (18 keywords):
+These are 4–6 word phrases with high purchase intent. Lower volume but highest conversion rate.
+Use exact match for the most specific purchase-intent phrases, phrase match for slightly broader ones.
+
+Exact match long-tails (high-intent, very specific):
+- buy + [brand name] + [specific product] + online → 精确匹配
+- [brand name] + [specific product] + free shipping → 精确匹配
+- [specific product] + for + [specific audience] + [qualifier] → 精确匹配
+- best + [specific product] + for + [specific use case] + [year] → 精确匹配
+- [specific product] + [key feature] + [audience qualifier] → 精确匹配
+- [specific product] + with + [key feature] → 精确匹配
+
+Phrase match long-tails (specific but allow some variation):
+- best + [specific product type] + for + [audience type] → 短语匹配
+- [product type] + for + [specific scenario / occasion] → 短语匹配
+- [product type] + [feature] + for + [use case] → 短语匹配
+- affordable + [product type] + for + [audience] → 短语匹配
+- [product type] + recommended by + [authority type] → 短语匹配
+- [product type] + [adjective] + [specific audience] → 短语匹配
+
+Broad match long-tails (discovery — let Google expand):
+- [specific audience] + looking for + [product type] → 广泛匹配
+- what is the best + [product category] + for + [use case] → 广泛匹配
+- [product type] + that works for + [specific condition/need] → 广泛匹配
+- [problem] + and how to fix it with + [product type] → 广泛匹配
+- best value + [product type] + [qualifier] → 广泛匹配
+- [product type] + gift for + [recipient type] → 广泛匹配
+
+**Quality Score alignment rule**: For each keyword cluster, at least one headline and one description must mirror the cluster's core keyword language directly. This is mandatory for Quality Score ≥7.
+---
+
+## Step 3 — Generate Google Ads Content
+
+### Content Rules (apply to ALL output):
+- Language: English
+- Title Case: capitalize principal words, never all-caps any word
+- Exclamation marks: maximum 1 across the entire output
+- No countdown urgency language (no "X days left", "ends today", "limited time")
+- Scarcity/urgency alternatives: "Limited Stock", "While Supplies Last", "Exclusive Deal", "Shop the Official Store"
+- No invented claims: only use facts visible on the store page
+- Banned words: guaranteed, miracle, cure, 100% safe, earn money, lowest price anywhere, #1 in the world
+- No competitor brand names
+- No Amazon platform terms in keywords: do not use keywords containing "amazon", "prime", "fulfilled by amazon"
 
 ---
 
-# Google Ads合规强制要求（逐条检查，必须全部通过）
-在输出前，对所有内容执行以下审查清单：
+### Part 1: Pinned Headlines (5 items)
+- Format: [Brand Name] + [product type or brand promise]
+- Max 20 characters (including spaces) — count precisely
+- These always show: make them brand-recognition anchors
+- Use the brand's actual product vocabulary, not generic terms
 
-☑ 标题字符数 ≤30，描述字符数 ≤70（精确计算，含空格）
-☑ 禁止全大写单词（"FREE"→"Free"，"SHOP"→"Shop"）
-☑ 感叹号全文最多出现1次
-☑ 禁止绝对化语言（"#1 in the world"→"Top-Rated"）
-☑ 禁止夸大保证词（"guaranteed"、"miracle"、"100% cure"）
-☑ 禁止出现竞争对手品牌名
-☑ 禁止价格虚假承诺（如"Lowest Price"无法核实）
-☑ 禁止政策敏感词（医疗声明、虚假折扣等）
-☑ 关键词与广告标题语义相关，确保Quality Score信号一致
+### Part 2: Ad Headlines (18 items)
+- Max 30 characters (including spaces) — count precisely, reject any over 30
+- Must cover all 8 dimensions below, minimum 2 headlines per dimension:
+
+  **Dimension 1 — Brand + Product**: Combine brand name with core product keyword
+  **Dimension 2 — Functional Feature**: Lead with the product's #1 technical differentiator
+  **Dimension 3 — Pain Point Resolution**: Address the specific problem this product solves
+  **Dimension 4 — Value Proposition**: Concrete value signal (specific price, rating like "4.8 Stars", or "Free Shipping")
+  **Dimension 5 — Social Proof**: Use real numbers from the page ("10K+ Reviews", "Top Rated")
+  **Dimension 6 — Competitive Positioning**: "Better Than [generic alternative]", "Top-Rated [category]"
+  **Dimension 7 — Use Case / Scene**: Specific scenario ("Perfect for Senior Dogs", "For Home Office Use")
+  **Dimension 8 — CTA**: Strong verb + object ("Shop [Brand] Now", "Get Yours Today", "Order [Product]")
+
+- At least 4 headlines must contain the anchor product's primary keyword phrase
+- Vary length: mix short punchy (15-22 chars) with information-dense (25-30 chars)
+
+### Part 3: Ad Descriptions (8 items)
+- Max 90 characters (including spaces) — this is the correct Google Ads limit, count precisely
+- Structure: Hook + Value Proposition + CTA (all three must be present in each description)
+- Each description must cover a distinct psychological trigger — no two descriptions can lead with the same angle
+- Banned: generic filler phrases ("high quality", "great product", "you won't be disappointed")
+
+Required triggers (one per description, in this order):
+1. **Pain point** — open with the problem, close with the solution + CTA
+2. **Social proof** — open with a real metric (reviews, rating, user count) + CTA
+3. **Feature-to-benefit** — name a specific feature, explain what it means for the user + CTA
+4. **Competitive differentiation** — why this beats the generic alternative + CTA
+5. **Audience identity** — speak directly to a specific user type ("Dog owners who…", "Remote workers need…") + CTA
+6. **Value anchor** — price point, free shipping, or bundle value + CTA
+7. **Scarcity / exclusivity** — limited stock signal or official store angle + CTA
+8. **Outcome / transformation** — describe the life improvement after purchase + CTA
+
+### Part 4: Keyword Matrix (38 items minimum)
+- All lowercase
+- 2–5 word phrases (avoid single-word keywords — too broad, too expensive, zero Quality Score signal)
+- Do NOT include: amazon, prime, kickstarter, crowdfunding, or any retailer/platform name
+- Do NOT use vague category terms with no modifier: "pet products", "electronics", "home goods"
+- Each keyword MUST fit one of the 4 structural clusters defined in Step 2
+- Label each with recommended match type based on commercial intent:
+  - 精确匹配: high-intent transactional phrases (buy/order/get + specific product)
+  - 短语匹配: moderate-intent research phrases (best/review/vs + product type)
+  - 广泛匹配: discovery-intent problem phrases (how to/solution/for [audience])
+
+Quantity breakdown:
+- Cluster A (Brand Intent): 6 keywords
+- Cluster B (Product Specific): 10 keywords
+- Cluster C (Problem-Solution): 10 keywords
+- Cluster D (Competitor Conquest): 6 keywords
+- Bonus — Long-tail high-conversion (4+ word phrases with specific qualifiers): 6 keywords
 
 ---
 
-# 输出格式
-必须是合法的JSON对象，不含任何Markdown格式或代码块标记，特殊符号（双引号、单引号、&符号等）使用标准JSON转义处理：
+## Step 4: Self-Audit Before Output
 
+Check every item against this list. Fix any violations before outputting:
+
+[ ] All pinned headlines ≤20 characters
+[ ] All headlines ≤30 characters
+[ ] All descriptions ≤90 characters
+[ ] No all-caps words anywhere
+[ ] Total exclamation marks across entire output ≤1
+[ ] No countdown or date-specific urgency language
+[ ] No invented statistics or claims not found on the page
+[ ] No banned words present
+[ ] No competitor brand names
+[ ] No platform names in keywords (amazon/prime/kickstarter etc.)
+[ ] No single-word keywords
+[ ] No vague category keywords without modifiers
+[ ] At least 1 brand exact-match keyword present
+[ ] Headlines and descriptions use language that mirrors the keyword clusters (Quality Score signal)
+[ ] Each description has Hook + Value + CTA structure
+
+---
+
+## Output format for each keyword — match type syntax rules (strictly enforced):
+- 精确匹配: wrap the keyword in square brackets → [keyword phrase here]
+- 短语匹配: wrap the keyword in escaped double quotes → \"keyword phrase here\"
+- 广泛匹配: output the keyword as plain text, no wrapping characters → keyword phrase here
+
+Example output:
 {
-    "brand_summary": {
-        "brand_name": "品牌名",
-        "core_products": ["产品线1", "产品线2", "产品线3"],
-        "key_differentiator": "核心差异化一句话总结",
-        "target_audience": "目标用户描述"
-    },
-    "pinned_headlines": [
-        {
-            "char_count": 字符数,
-            "content": "固定展示内容（英文）"
-        }
-    ],
-    "headlines": [
-        {
-            "emphasis": "侧重点（中文）",
-            "dimension": "所属维度（中文）",
-            "char_count": 字符数,
-            "content": "标题（英文）"
-        }
-    ],
-    "descriptions": [
-        {
-            "emphasis": "侧重点（中文）",
-            "trigger": "心理触发点类型（中文）",
-            "char_count": 字符数,
-            "content": "描述语（英文）"
-        }
-    ],
-    "keywords": [
-        {
-            "type": "关键词类别（中文）",
-            "match_type": "推荐匹配类型（中文）",
-            "content": "关键词（英文）"
-        }
-    ]
-}`,
+  "cluster": "品牌意图",
+  "match_type": "精确匹配",
+  "intent_stage": "购买意图",
+  "content": "[brandname dog tracker]"
+},
+{
+  "cluster": "产品专项高意图",
+  "match_type": "短语匹配",
+  "intent_stage": "研究对比",
+  "content": "\"best gps dog collar\""
+},
+{
+  "cluster": "问题解决发现",
+  "match_type": "广泛匹配",
+  "intent_stage": "问题发现",
+  "content": "how to track my dog outside"
+}
+
+CRITICAL: The bracket and quote characters are part of the keyword value itself.
+- For 精确匹配: the content string must start with [ and end with ]
+- For 短语匹配: the content string must start with \" and end with \"
+- For 广泛匹配: the content string has no wrapping characters
+Do NOT add any extra spaces inside the brackets or quotes.`,
             AmazonDetail: `基于这个Amazon产品页的内容:{url}
 提炼落地页核心信息，然后根据这些页面信息提供适用于Google Ads投放的内容，要求包含：
 1、5条固定显示内容，品牌名+产品名+特色信息/核心功能，要求最适合投Amazon产品投放的关键词结构。用英文，最多20个字符；
