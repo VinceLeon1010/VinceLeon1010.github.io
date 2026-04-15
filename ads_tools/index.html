@@ -1015,30 +1015,34 @@ Check every item against this list. Fix any violations before outputting:
 [ ] Each description has Hook + Value + CTA structure
 
 ---
+Output ONLY a valid JSON object. No markdown formatting, no code blocks, no explanation text before or after the JSON. Escape all special characters (double quotes, apostrophes) within string values using backslash.
 
-## Output format for each keyword — match type syntax rules (strictly enforced):
-- 精确匹配: wrap the keyword in square brackets → [keyword phrase here]
-- 短语匹配: wrap the keyword in escaped double quotes → \"keyword phrase here\"
-- 广泛匹配: output the keyword as plain text, no wrapping characters → keyword phrase here
-
-Example output:
 {
-  "cluster": "品牌意图",
-  "match_type": "精确匹配",
-  "intent_stage": "购买意图",
-  "content": "[brandname dog tracker]"
-},
-{
-  "cluster": "产品专项高意图",
-  "match_type": "短语匹配",
-  "intent_stage": "研究对比",
-  "content": "\"best gps dog collar\""
-},
-{
-  "cluster": "问题解决发现",
-  "match_type": "广泛匹配",
-  "intent_stage": "问题发现",
-  "content": "how to track my dog outside"
+    "pinned_headlines": [
+        {
+            "content": "英文固定标题"
+        }
+    ],
+    "headlines": [
+        {
+            "emphasis": "侧重点（中文）",
+            "char_count": 字符数整数,
+            "content": "英文标题"
+        }
+    ],
+    "descriptions": [
+        {
+            "emphasis": "侧重点（中文）",
+            "char_count": 字符数整数,
+            "content": "英文描述"
+        }
+    ],
+    "keywords": [
+        {
+            "type": "关键词类别（中文）",
+            "content": "英文关键词"
+        }
+    ]
 }
 
 CRITICAL: The bracket and quote characters are part of the keyword value itself.
