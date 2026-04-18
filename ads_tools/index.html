@@ -793,59 +793,80 @@ Output ONLY a valid JSON object. No markdown formatting, no code blocks, no expl
         }
     ]
 }`,
-            Amazon2: `You are a senior Google Ads PPC strategist specializing in Amazon affiliate marketing. Your expertise covers pet supplies, consumer electronics, home goods, and multi-category Amazon storefronts. Your primary goal is to generate ad content that achieves high Quality Score, strong CTR, and affiliate conversion.
+            Amazon2: `OUTPUT CONSTRAINT — READ THIS FIRST BEFORE ANY OTHER INSTRUCTION:
+Your response must be ONE valid JSON object and nothing else.
+- No markdown, no code fences, no explanation text, no headers, no comments
+- Do not write anything before the opening { or after the closing }
+- If you cannot access or read the store URL, return exactly: {}
+- If the page content does not match any real product (e.g., you are guessing), return exactly: {}
+
+---
+
+You are a senior Google Ads PPC strategist specializing in Amazon affiliate marketing. Your expertise covers pet supplies, consumer electronics, home goods, and multi-category Amazon storefronts. Your primary goal is to generate ad content that achieves high Quality Score, strong CTR, and affiliate conversion.
 
 ## Store URL
-{url}
+{url}(见图片)
+
+---
+
+## Step 0 — URL Verification (mandatory gate, do not skip)
+
+Before doing anything else:
+1. Attempt to fetch and read the content at the URL above
+2. Identify the actual brand name, actual product categories, and actual product names visible on that page
+3. Write down (internally) 3 specific product names or SKUs you can see on the page right now
+4. If you cannot load the page, or the page returns an error, or you cannot identify specific products — STOP and return: {}
+5. If the products you identified do not match the ad content you are about to generate — STOP, re-read the page, and regenerate based only on what you actually see
+
+ANTI-HALLUCINATION RULE: Every brand name, product name, feature claim, price point, star rating, and review count used in the output MUST be directly visible on the store page. If you are not certain a fact is on the page, do not include it. Do not infer, assume, or invent any product details.
+
+CONTENT LOCK: After Step 0, record internally:
+- confirmed_brand: [the exact brand name you read from the page]
+- confirmed_anchor_product: [the specific product name/SKU with the most reviews or Best Seller badge]
+- confirmed_categories: [list of actual product categories visible]
+
+All ad copy generated in Steps 1–4 must reference only confirmed_brand, confirmed_anchor_product, and confirmed_categories. If any generated content references a product or category not in your confirmed list, discard it and regenerate.
 
 ---
 
 ## Step 1 — Brand Intelligence Extraction (internal reasoning, do not output)
 
-Visit the URL above and extract:
+Using only content confirmed in Step 0, extract:
 - Brand name (exact spelling as shown on Amazon)
-- All visible product lines / categories (list every distinct category you can identify)
+- All visible product lines / categories
 - For each product line: top 3 functional features or selling points
-- Brand differentiators vs. generic Amazon alternatives (e.g., patented design, vet-approved, premium materials)
+- Brand differentiators vs. generic Amazon alternatives
 - Target audience profile (lifestyle, use case, demographic signals)
-- Price positioning (budget / mid-range / premium — based on visible price points)
-- Social proof signals (star rating, number of reviews, "Amazon's Choice" or "Best Seller" badge if visible)
-- Most reviewed / best-selling product (this becomes the anchor product for ad copy)
+- Price positioning (budget / mid-range / premium)
+- Social proof signals (star rating, review count, "Amazon's Choice" or "Best Seller" badge if visible)
+- Most reviewed / best-selling product → this is the anchor product
 
 ---
 
 ## Step 2 — Keyword Architecture Planning (internal reasoning, do not output)
 
-Before writing any ad copy, map out the keyword universe using this framework:
+All keywords must be derived from the confirmed_brand, confirmed_anchor_product, and confirmed_categories identified in Step 0. Do not generate keywords for product types not found on the page.
 
-**Identify the anchor product** (highest reviews or "Best Seller" tagged item).
-
-**Match Type Assignment Rules — apply these strictly:**
+**Match Type Assignment Rules:**
 
 EXACT MATCH [精确匹配]:
-- Use for: high-commercial-intent phrases where the user is clearly ready to buy
+- High-commercial-intent phrases where the user is clearly ready to buy
 - Pattern: buy + [specific product], [brand name] + [product], order + [specific product]
-- Goal: protect budget, only trigger on highly relevant searches
-- Volume expectation: lower volume, higher conversion rate
+- Brand keywords: ALWAYS exact match, never broad
 
 PHRASE MATCH [短语匹配]:
-- Use for: research and comparison-stage queries where word order matters
+- Research and comparison-stage queries
 - Pattern: best + [product type], [product type] + review, [product type] + for + [use case]
-- Goal: capture mid-funnel users who are evaluating options
-- Volume expectation: medium volume, medium conversion rate
 
 BROAD MATCH [广泛匹配]:
-- Use ONLY when paired with Smart Bidding (tCPA or tROAS)
-- Use for: problem-aware and discovery-stage queries
-- Pattern: [problem description], [use case] + [need], how to + [problem]
-- Goal: discover new converting search terms via Google's signal learning
-- Volume expectation: highest volume, lowest initial conversion — needs learning period
-- WARNING: Do NOT use broad match for brand keywords (brand terms must be exact match only)
+- Use ONLY with Smart Bidding (tCPA or tROAS)
+- Problem-aware and discovery-stage queries
+- Pattern: [problem description], how to + [problem], [use case] + [need]
+- WARNING: Never broad match brand keywords
 
-**Build keyword clusters using these structurally validated high-intent patterns:**
+**Keyword Clusters:**
 
-Cluster A — Brand Intent (6 keywords):
-Exact match only for pure brand terms. Phrase match for brand + modifier combinations.
+Cluster A — Brand Intent (6 keywords)
 - [brand name] → 精确匹配
 - [brand name] + [product type] → 精确匹配
 - [brand name] + review → 短语匹配
@@ -853,13 +874,12 @@ Exact match only for pure brand terms. Phrase match for brand + modifier combina
 - [brand name] + discount / deal / coupon → 短语匹配
 - where to buy + [brand name] → 精确匹配
 
-Cluster B — Product-Specific High Intent (12 keywords):
-Mix of exact and phrase match. These users know what they want.
+Cluster B — Product-Specific High Intent (12 keywords)
 - buy + [specific product name] → 精确匹配
 - [specific product name] + review → 短语匹配
 - best + [specific product type] → 短语匹配
 - best + [specific product type] + for + [primary use case] → 短语匹配
-- [specific product type] + [year] (e.g., "best dog GPS 2026") → 短语匹配
+- [specific product type] + [year] → 短语匹配
 - [specific product type] + under + [price point] → 精确匹配
 - [specific product type] + vs + [known alternative type] → 短语匹配
 - affordable + [specific product type] → 短语匹配
@@ -868,8 +888,7 @@ Mix of exact and phrase match. These users know what they want.
 - [specific product type] + deal → 精确匹配
 - [specific product type] + sale → 精确匹配
 
-Cluster C — Problem-Solution Discovery (10 keywords):
-Primarily broad match to capture problem-aware users. These users describe symptoms, not products.
+Cluster C — Problem-Solution Discovery (10 keywords, primarily broad match)
 - how to + [solve the core problem this product addresses] → 广泛匹配
 - best + [solution category] + for + [specific problem] → 广泛匹配
 - [problem keyword] + solution → 广泛匹配
@@ -881,8 +900,7 @@ Primarily broad match to capture problem-aware users. These users describe sympt
 - [product type] + for beginners → 短语匹配
 - [product type] + easy to use → 广泛匹配
 
-Cluster D — Competitor Category Conquest (6 keywords):
-Phrase match for comparison queries. Never use exact competitor brand names.
+Cluster D — Competitor Category Conquest (6 keywords)
 - [product type] + alternative → 短语匹配
 - [product type] + comparison → 短语匹配
 - [product type] + worth it → 短语匹配
@@ -890,11 +908,8 @@ Phrase match for comparison queries. Never use exact competitor brand names.
 - better + [product type] → 短语匹配
 - [product category] + which is best → 广泛匹配
 
-Cluster E — Long-Tail High-Conversion (18 keywords):
-These are 4–6 word phrases with high purchase intent. Lower volume but highest conversion rate.
-Use exact match for the most specific purchase-intent phrases, phrase match for slightly broader ones.
-
-Exact match long-tails (high-intent, very specific):
+Cluster E — Long-Tail High-Conversion (18 keywords)
+Exact match long-tails (6):
 - buy + [brand name] + [specific product] + online → 精确匹配
 - [brand name] + [specific product] + free shipping → 精确匹配
 - [specific product] + for + [specific audience] + [qualifier] → 精确匹配
@@ -902,28 +917,29 @@ Exact match long-tails (high-intent, very specific):
 - [specific product] + [key feature] + [audience qualifier] → 精确匹配
 - [specific product] + with + [key feature] → 精确匹配
 
-Phrase match long-tails (specific but allow some variation):
+Phrase match long-tails (6):
 - best + [specific product type] + for + [audience type] → 短语匹配
-- [product type] + for + [specific scenario / occasion] → 短语匹配
+- [product type] + for + [specific scenario] → 短语匹配
 - [product type] + [feature] + for + [use case] → 短语匹配
 - affordable + [product type] + for + [audience] → 短语匹配
 - [product type] + recommended by + [authority type] → 短语匹配
 - [product type] + [adjective] + [specific audience] → 短语匹配
 
-Broad match long-tails (discovery — let Google expand):
+Broad match long-tails (6):
 - [specific audience] + looking for + [product type] → 广泛匹配
 - what is the best + [product category] + for + [use case] → 广泛匹配
-- [product type] + that works for + [specific condition/need] → 广泛匹配
+- [product type] + that works for + [specific condition] → 广泛匹配
 - [problem] + and how to fix it with + [product type] → 广泛匹配
 - best value + [product type] + [qualifier] → 广泛匹配
 - [product type] + gift for + [recipient type] → 广泛匹配
 
-**Quality Score alignment rule**: For each keyword cluster, at least one headline and one description must mirror the cluster's core keyword language directly. This is mandatory for Quality Score ≥7.
+Quality Score alignment rule: For each keyword cluster, at least one headline and one description must mirror the cluster's core keyword language directly.
+
 ---
 
 ## Step 3 — Generate Google Ads Content
 
-### Content Rules (apply to ALL output):
+### Content Rules:
 - Language: English
 - Title Case: capitalize principal words, never all-caps any word
 - Exclamation marks: maximum 1 across the entire output
@@ -934,122 +950,131 @@ Broad match long-tails (discovery — let Google expand):
 - No competitor brand names
 - No Amazon platform terms in keywords: do not use keywords containing "amazon", "prime", "fulfilled by amazon"
 
----
-
 ### Part 1: Pinned Headlines (5 items)
 - Format: [Brand Name] + [product type or brand promise]
-- Max 20 characters (including spaces) — count precisely
-- These always show: make them brand-recognition anchors
-- Use the brand's actual product vocabulary, not generic terms
+- Max 20 characters including spaces — count precisely
+- Brand-recognition anchors using actual product vocabulary from the page
 
 ### Part 2: Ad Headlines (18 items)
-- Max 30 characters (including spaces) — count precisely, reject any over 30
-- Must cover all 8 dimensions below, minimum 2 headlines per dimension:
-
-  **Dimension 1 — Brand + Product**: Combine brand name with core product keyword
-  **Dimension 2 — Functional Feature**: Lead with the product's #1 technical differentiator
-  **Dimension 3 — Pain Point Resolution**: Address the specific problem this product solves
-  **Dimension 4 — Value Proposition**: Concrete value signal (specific price, rating like "4.8 Stars", or "Free Shipping")
-  **Dimension 5 — Social Proof**: Use real numbers from the page ("10K+ Reviews", "Top Rated")
-  **Dimension 6 — Competitive Positioning**: "Better Than [generic alternative]", "Top-Rated [category]"
-  **Dimension 7 — Use Case / Scene**: Specific scenario ("Perfect for Senior Dogs", "For Home Office Use")
-  **Dimension 8 — CTA**: Strong verb + object ("Shop [Brand] Now", "Get Yours Today", "Order [Product]")
-
+- Max 30 characters including spaces — count precisely, reject any over 30
+- Must cover all 8 dimensions, minimum 2 headlines per dimension:
+  1. Brand + Product
+  2. Functional Feature
+  3. Pain Point Resolution
+  4. Value Proposition (price, rating, Free Shipping)
+  5. Social Proof (real numbers from the page)
+  6. Competitive Positioning
+  7. Use Case / Scene
+  8. CTA (Shop/Get/Order + object)
 - At least 4 headlines must contain the anchor product's primary keyword phrase
-- Vary length: mix short punchy (15-22 chars) with information-dense (25-30 chars)
+- Mix lengths: some 15-22 chars, some 25-30 chars
 
 ### Part 3: Ad Descriptions (8 items)
-- Max 90 characters (including spaces) — this is the correct Google Ads limit, count precisely
-- Structure: Hook + Value Proposition + CTA (all three must be present in each description)
-- Each description must cover a distinct psychological trigger — no two descriptions can lead with the same angle
-- Banned: generic filler phrases ("high quality", "great product", "you won't be disappointed")
+- Max 90 characters including spaces — count precisely
+- Structure every description: Hook + Value Proposition + CTA
+- Each description uses a distinct psychological trigger, no two lead with the same angle
+- Banned filler: "high quality", "great product", "you won't be disappointed"
+- Triggers (one per description):
+  1. Pain point → solution + CTA
+  2. Social proof metric → CTA
+  3. Feature → benefit → CTA
+  4. Competitive differentiation → CTA
+  5. Audience identity → benefit → CTA
+  6. Value anchor (price / shipping) → CTA
+  7. Scarcity / exclusivity → CTA
+  8. Outcome / transformation → CTA
 
-Required triggers (one per description, in this order):
-1. **Pain point** — open with the problem, close with the solution + CTA
-2. **Social proof** — open with a real metric (reviews, rating, user count) + CTA
-3. **Feature-to-benefit** — name a specific feature, explain what it means for the user + CTA
-4. **Competitive differentiation** — why this beats the generic alternative + CTA
-5. **Audience identity** — speak directly to a specific user type ("Dog owners who…", "Remote workers need…") + CTA
-6. **Value anchor** — price point, free shipping, or bundle value + CTA
-7. **Scarcity / exclusivity** — limited stock signal or official store angle + CTA
-8. **Outcome / transformation** — describe the life improvement after purchase + CTA
-
-### Part 4: Keyword Matrix (38 items minimum)
+### Part 4: Keyword Matrix (52 items)
 - All lowercase
-- 2–5 word phrases (avoid single-word keywords — too broad, too expensive, zero Quality Score signal)
-- Do NOT include: amazon, prime, kickstarter, crowdfunding, or any retailer/platform name
-- Do NOT use vague category terms with no modifier: "pet products", "electronics", "home goods"
-- Each keyword MUST fit one of the 4 structural clusters defined in Step 2
-- Label each with recommended match type based on commercial intent:
-  - 精确匹配: high-intent transactional phrases (buy/order/get + specific product)
-  - 短语匹配: moderate-intent research phrases (best/review/vs + product type)
-  - 广泛匹配: discovery-intent problem phrases (how to/solution/for [audience])
+- 2–6 word phrases, no single-word keywords
+- No platform names: amazon, prime, kickstarter, indiegogo, walmart, ebay
+- No vague unmodified category terms
+- Match type distribution: 精确匹配 ~35% / 短语匹配 ~40% / 广泛匹配 ~25%
 
-Quantity breakdown:
-- Cluster A (Brand Intent): 6 keywords
-- Cluster B (Product Specific): 10 keywords
-- Cluster C (Problem-Solution): 10 keywords
-- Cluster D (Competitor Conquest): 6 keywords
-- Bonus — Long-tail high-conversion (4+ word phrases with specific qualifiers): 6 keywords
+Keyword content format rules (strictly enforced, no exceptions):
+- 精确匹配 keywords: the content value MUST start with [ and end with ]
+  Correct: "[brand name dog collar]"
+  Wrong: "brand name dog collar", "brand name dog collar [精确匹配]", "[brand name dog collar] (精确匹配)"
+- 短语匹配 keywords: the content value MUST start with " and end with "
+  Correct: "\"best dog collar for large dogs\""
+  Wrong: "best dog collar for large dogs", "best dog collar (词组匹配)"
+- 广泛匹配 keywords: plain text only, no brackets, no quotes, no parentheses, no Chinese annotations
+  Correct: "how to stop dog from pulling leash"
+  Wrong: "how to stop dog from pulling leash (广泛匹配)", "(how to stop dog from pulling leash)"
+- NEVER append match type labels in parentheses or any other notation after the keyword text
 
 ---
 
 ## Step 4: Self-Audit Before Output
 
-Check every item against this list. Fix any violations before outputting:
+Fix all violations before outputting. Do not output until all checks pass:
 
+[ ] All content references only confirmed_brand and confirmed products from Step 0
+[ ] No product names, features, or claims that are not visible on the actual store page
 [ ] All pinned headlines ≤20 characters
 [ ] All headlines ≤30 characters
 [ ] All descriptions ≤90 characters
-[ ] No all-caps words anywhere
-[ ] Total exclamation marks across entire output ≤1
-[ ] No countdown or date-specific urgency language
-[ ] No invented statistics or claims not found on the page
-[ ] No banned words present
+[ ] No all-caps words
+[ ] Total exclamation marks ≤1
+[ ] No countdown or date-specific language
+[ ] No banned words
 [ ] No competitor brand names
-[ ] No platform names in keywords (amazon/prime/kickstarter etc.)
+[ ] No platform names in keywords
 [ ] No single-word keywords
-[ ] No vague category keywords without modifiers
-[ ] At least 1 brand exact-match keyword present
-[ ] Headlines and descriptions use language that mirrors the keyword clusters (Quality Score signal)
-[ ] Each description has Hook + Value + CTA structure
+[ ] No vague unmodified category keywords
+[ ] 精确匹配 keywords start with [ and end with ]
+[ ] 短语匹配 keywords start with " and end with "
+[ ] 广泛匹配 keywords are plain text with no trailing annotations
+[ ] Quality Score: headlines and descriptions mirror keyword cluster language
+[ ] Each description has Hook + Value + CTA
 
 ---
-Output ONLY a valid JSON object. No markdown formatting, no code blocks, no explanation text before or after the JSON. Escape all special characters (double quotes, apostrophes) within string values using backslash.
+
+## Final Output Instruction
+
+Output the following JSON object and nothing else.
+No text before {. No text after }. No markdown. No code fences.
 
 {
+    "brand_summary": {
+        "brand_name": "品牌名",
+        "anchor_product": "主推产品名称",
+        "core_products": ["产品线1", "产品线2", "产品线3"],
+        "key_differentiator": "核心差异化一句话",
+        "target_audience": "目标用户描述",
+        "social_proof": "评分/评价数量/徽章（页面可见内容）"
+    },
     "pinned_headlines": [
         {
-            "content": "英文固定标题"
+            "char_count": 字符数整数,
+            "content": "固定标题（英文）"
         }
     ],
     "headlines": [
         {
             "emphasis": "侧重点（中文）",
+            "dimension": "所属维度（中文）",
             "char_count": 字符数整数,
-            "content": "英文标题"
+            "content": "标题（英文）"
         }
     ],
     "descriptions": [
         {
             "emphasis": "侧重点（中文）",
+            "trigger": "心理触发点（中文）",
             "char_count": 字符数整数,
-            "content": "英文描述"
+            "content": "描述语（英文）"
         }
     ],
     "keywords": [
         {
-            "type": "关键词类别（中文）",
-            "content": "英文关键词"
+            "cluster": "所属集群（中文）",
+            "match_type": "精确匹配 / 短语匹配 / 广泛匹配",
+            "intent_stage": "购买意图 / 研究对比 / 问题发现",
+            "content": "关键词（含匹配符号）"
         }
     ]
-}
-
-CRITICAL: The bracket and quote characters are part of the keyword value itself.
-- For 精确匹配: the content string must start with [ and end with ]
-- For 短语匹配: the content string must start with \" and end with \"
-- For 广泛匹配: the content string has no wrapping characters
-Do NOT add any extra spaces inside the brackets or quotes.`,
+}`,
             AmazonDetail: `基于这个Amazon产品页的内容:{url}
 提炼落地页核心信息，然后根据这些页面信息提供适用于Google Ads投放的内容，要求包含：
 1、5条固定显示内容，品牌名+产品名+特色信息/核心功能，要求最适合投Amazon产品投放的关键词结构。用英文，最多20个字符；
