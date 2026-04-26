@@ -716,7 +716,6 @@ Generate the following:
 **4. Keywords (40 items)**
 - English only, all lowercase
 - Must include: at least 1 exact brand name keyword, at least 1 exact product name keyword
-- Label each keyword's match type intent: 精确匹配 / 词组匹配 / 广泛匹配
 - Organize by search intent: transactional (buy/order/get/shop), comparative (best/vs/review/alternative), discovery (what is/how to/[problem keyword])
 - Target keywords with estimated monthly searches >100 on Google
 - Forbidden: any keyword containing kickstarter, crowdfunding, indiegogo, or any funding platform name
@@ -726,6 +725,21 @@ Generate the following:
   - [product category] + qualifier (best, top, portable, wireless, smart, etc.)
   - [competitor category] + alternative
   - [audience] + [need] format
+
+- **CRITICAL — Keyword match type formatting rules:**
+  The "type" field is for classification only. The "content" field MUST embed the match type symbol directly into the keyword string using these exact Google Ads formats:
+  - Broad match (广泛匹配): no symbols — write the keyword as-is, e.g. \`portable air purifier\`
+  - Phrase match (词组匹配): wrap with straight double quotes — e.g. \`"portable air purifier"\`
+  - Exact match (精确匹配): wrap with square brackets — e.g. \`[portable air purifier]\`
+
+  DO NOT add any parentheses, labels, or annotations inside the "content" string.
+  DO NOT write \`portable air purifier (exact)\` or \`portable air purifier [exact match]\`.
+  The ONLY difference between match types in the "content" field is the surrounding symbol (or lack thereof).
+
+  Correct examples:
+  - \`{"type": "广泛匹配", "content": "portable air purifier"}\`
+  - \`{"type": "词组匹配", "content": "\\"portable air purifier\\""}\`
+  - \`{"type": "精确匹配", "content": "[portable air purifier]"}\`
 
 Output ONLY a valid JSON object. No markdown formatting, no code blocks, no explanation text before or after the JSON. Escape all special characters (double quotes, apostrophes) within string values using backslash.
 
@@ -752,7 +766,7 @@ Output ONLY a valid JSON object. No markdown formatting, no code blocks, no expl
     "keywords": [
         {
             "type": "关键词类别（中文）",
-            "content": "英文关键词"
+            "content": "英文关键词（含格式符号）"
         }
     ]
 }`,
