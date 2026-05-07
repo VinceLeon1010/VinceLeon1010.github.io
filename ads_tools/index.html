@@ -647,11 +647,13 @@
         }
     ]
 }`,
-            Kickstarter2: `You are a senior Google Ads copywriter and PPC strategist specializing in affiliate marketing for Kickstarter campaigns. Your goal is to maximize CTR (click-through rate) and conversion rate for affiliate traffic sent to Kickstarter product pages.
+            Kickstarter2: `You are a senior Google Ads copywriter and PPC strategist specializing in affiliate marketing for Kickstarter campaigns. Your goal is to maximize CTR (click-through rate) and **conversion rate** for affiliate traffic sent to Kickstarter product pages, while eliminating wasted ad spend on low-intent searches and broad match keywords.
 
 Analyze the Kickstarter campaign page at: {url}
 
-Step 1 — Extract core intelligence:
+---
+
+## Step1 — Extract core intelligence
 - Product name and category
 - Primary value proposition (what problem does it solve?)
 - Key features and differentiators (vs. alternatives)
@@ -660,12 +662,19 @@ Step 1 — Extract core intelligence:
 - Social proof signals (backers count, funding percentage, press mentions)
 - Any scarcity signals (limited reward tiers, limited units, early bird pricing)
 
-Step 2 — Identify search intent layers:
-- Transactional intent: users ready to buy or back ("buy [product]", "get [product]", "order [product]")
-- Comparative intent: users evaluating options ("best [product type]", "[product] vs [alternative]", "[product] review")
-- Informational/discovery intent: users learning about the problem ("best [solution category]", "how to [solve problem]")
+---
 
-Step 3 — Generate Google Ads content. All content must:
+## Step2 — Identify search intent layers (ONLY high-intent, no wasted spend)
+- **Transactional intent** (highest priority): users ready to buy/back → examples: "buy [product]", "get [product]", "order [product]", "[product] review"
+- **Comparative intent** (secondary priority): users evaluating options → examples: "best [product type]", "[product] vs [alternative]", "top [product category]"
+- **STRICTLY FORBIDDEN intent layers**:
+  - Informational/discovery intent containing "how to", "why", "what is", "what are", "guide", "tutorial" → extremely low conversion, pure budget waste
+  - Any broad match keywords (广泛匹配) → high spend, low relevance, disabled entirely
+
+---
+
+## Step3 — Generate Google Ads content
+All content must:
 - Be written in English
 - Use Title Case (capitalize main words, NOT all caps)
 - Use maximum ONE exclamation mark across ALL generated content combined
@@ -675,14 +684,14 @@ Step 3 — Generate Google Ads content. All content must:
 - Avoid vague crowdfunding terms (e.g., Kickstarter project, crowdfunding campaign, back this project)
 - Be factually grounded in the page content — do not invent claims
 
-Generate the following:
+### Generate the following:
 
-**1. Pinned Headlines (5 items)**
+#### 1. Pinned Headlines (5 items)
 - Format: [Product Name] + [Core feature or benefit]
 - Max 20 characters each
 - These are always shown — make them brand-anchoring and recognition-focused
 
-**2. Ad Headlines (18 items)**
+#### 2. Ad Headlines (18 items)
 - Max 30 characters each
 - Cover these emphasis angles (at least one each):
   - Primary benefit / pain-point solved
@@ -695,10 +704,11 @@ Generate the following:
   - Problem-aware hook (question format: Tired of...? Looking for...?)
   - Target audience specific
   - Brand name + core promise
-- Headlines must naturally include high-volume keywords identified in Step 2
+- Headlines must naturally include high-volume keywords identified in Step2
 - Vary sentence structure: some short and punchy (under 20 chars), some use the full 30 chars
+- **FORBIDDEN**: Any headline containing "how to", "why", "what is"
 
-**3. Descriptions (8 items)**
+#### 3. Descriptions (8 items)
 - Max 88 characters each
 - Each description must take a distinctly different angle — do NOT repeat the same benefit twice
 - Must include at least one of per description: scarcity signal, social proof, specific benefit, CTA
@@ -712,36 +722,51 @@ Generate the following:
   - Comparison / differentiation → CTA
   - Price / value anchor → CTA
   - Question hook → answer → CTA
+- **FORBIDDEN**: Any description containing "how to", "why", "what is"
 
-**4. Keywords (40 items)**
+#### 4. Keywords (40 items)
 - English only, all lowercase
-- Must include: at least 1 exact brand name keyword, at least 1 exact product name keyword
-- Organize by search intent: transactional (buy/order/get/shop), comparative (best/vs/review/alternative), discovery (what is/how to/[problem keyword])
+- Must include: at least 1 exact brand name keyword (exact match), at least 1 exact product name keyword (exact match)
+- **STRICT PROHIBITIONS**:
+  1. No broad match (广泛匹配) keywords → ALL keywords must be either exact match or phrase match only
+  2. No keywords containing "how to", "why", "what is", "what are", "guide", "tutorial", "tips", "ideas" → low intent, waste budget
+  3. No keywords containing kickstarter, crowdfunding, indiegogo, or any funding platform name
+- Organize by high-intent search type (total 40 items):
+  - Transactional (buy/order/get/shop/review): 20 items (50%)
+  - Comparative (best/vs/review/alternative/top): 20 items (50%)
+  - Zero discovery/informational keywords allowed
 - Target keywords with estimated monthly searches >100 on Google
-- Forbidden: any keyword containing kickstarter, crowdfunding, indiegogo, or any funding platform name
-- Keyword formats to include:
-  - [product name] + action verb (buy, get, order, review)
-  - [problem] + solution format
-  - [product category] + qualifier (best, top, portable, wireless, smart, etc.)
-  - [competitor category] + alternative
-  - [audience] + [need] format
+- Keyword format rules:
+  - [product name] + action verb (buy, get, order, review) → prefer exact match
+  - [product category] + qualifier (best, top, portable, wireless, smart) → prefer phrase match
+  - [competitor product] + alternative → phrase match
+  - [audience] + [need] format → phrase match
 
-- **CRITICAL — Keyword match type formatting rules:**
-  The "type" field is for classification only. The "content" field MUST embed the match type symbol directly into the keyword string using these exact Google Ads formats:
-  - Broad match (广泛匹配): no symbols — write the keyword as-is, e.g. \`portable air purifier\`
-  - Phrase match (词组匹配): wrap with straight double quotes — e.g. \`"portable air purifier"\`
-  - Exact match (精确匹配): wrap with square brackets — e.g. \`[portable air purifier]\`
+##### CRITICAL — Keyword match type formatting rules
+The "type" field is for classification only. The "content" field MUST embed the match type symbol directly into the keyword string using these exact Google Ads formats:
+- **Phrase match (词组匹配)**: wrap with straight double quotes → e.g. \`"portable air purifier"\` (use for 50% of keywords, broader reach than exact but still restricted)
+- **Exact match (精确匹配)**: wrap with square brackets → e.g. \`[portable air purifier]\` (use for 50% of keywords, highest intent, lowest waste)
 
-  DO NOT add any parentheses, labels, or annotations inside the "content" string.
-  DO NOT write \`portable air purifier (exact)\` or \`portable air purifier [exact match]\`.
-  The ONLY difference between match types in the "content" field is the surrounding symbol (or lack thereof).
+DO NOT add any parentheses, labels, or annotations inside the "content" string.
+DO NOT write \`portable air purifier (exact)\` or \`portable air purifier [exact match]\`.
+The ONLY difference between match types in the "content" field is the surrounding symbol.
 
-  Correct examples:
-  - \`{"type": "广泛匹配", "content": "portable air purifier"}\`
-  - \`{"type": "词组匹配", "content": "\\"portable air purifier\\""}\`
-  - \`{"type": "精确匹配", "content": "[portable air purifier]"}\`
+Correct examples:
+- \`{"type": "词组匹配", "content": "\"portable air purifier\""}\`
+- \`{"type": "精确匹配", "content": "[portable air purifier]"}\`
+- **Incorrect (DO NOT USE)**: \`{"type": "广泛匹配", "content": "portable air purifier"}\` → broad match is strictly forbidden
 
-Output ONLY a valid JSON object. No markdown formatting, no code blocks, no explanation text before or after the JSON. Escape all special characters (double quotes, apostrophes) within string values using backslash.
+##### Self-check before finalizing keywords
+1. Remove any broad match keywords (广泛匹配) → only exact/phrase match allowed
+2. Remove any keywords containing "how to", "why", "what is", "what are", "guide", "tutorial"
+3. Remove any keywords containing kickstarter, crowdfunding, indiegogo
+4. Verify all keywords use correct format: exact \`[keyword]\` or phrase \`"keyword"\`
+5. Verify total count is exactly 40, split 20 transactional + 20 comparative
+
+---
+
+## Step4 — Output ONLY valid JSON
+No markdown formatting, no code blocks, no explanation text before or after the JSON. Escape all special characters (double quotes, apostrophes) within string values using backslash.
 
 {
     "pinned_headlines": [
