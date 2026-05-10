@@ -1344,7 +1344,8 @@ No text before {. No text after }. No markdown. No code fences.
         
         // 解析JSON按钮点击事件
         parseBtn.addEventListener('click', function() {
-            const jsonString = jsonInput.value.trim();
+            const jsonString = jsonInput.value.trim().replace(/(: ?)\"\"/g, '$1\"\\\"').replace(/(?<!\\)\"\"/g, '\\\"\"');
+            //console.log(jsonString);
             
             if (!jsonString) {
                 parsedResult.innerHTML = '<div class="info-message">请输入JSON数据</div>';
